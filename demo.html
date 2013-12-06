@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>easy-sketch.js demo</title>
+        <link rel="stylesheet" type="text/css" href="stylize/prism.css"/>
+        <script type="text/javascript" src="stylize/prism.js"></script>
+        <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script type="text/javascript" src="easy-sketch.js"></script>
+        <script type="text/javascript" src="demo.js" id="code"></script>
+        <script type="text/javascript">
+            $(function () {
+                $.get("demo.js", function (data) {
+                    $('code').html("\r\n" + data);
+                    Prism.highlightAll(true);
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <fieldset>
+            <legend>Pencil type</legend>
+            <button id="pencil">Pencil</button>
+            <button id="eraser">Eraser</button>
+        </fieldset>
+        <fieldset>
+            <legend>Controls</legend>
+            <div class="line-width-controls">
+                <label for="line-width-control">Line width:</label>
+                <span class="info" style="width: 15px; display: inline-block; text-align: center">5</span>
+                <input type="range" value="5" id="line-width-control" style="vertical-align: middle">
+            </div>
+            <div class="line-color-controls">
+                <label for="line-color-control">Line color (pencil only):</label>
+                <input type="color" value="#000" id="line-color-control" style="vertical-align: middle">
+            </div>
+        </fieldset>
+        <br>
+        <span id="canvas" style="float: left;">
+            <canvas id="drawing-canvas" width="500" height="500" style="border: 1px solid grey;"></canvas>
+        </span>
+
+        <div style="display: inline-block; margin-left: 20px;">
+            <pre>
+                <code class="language-javascript" style="margin-left: 20px;"></code>
+            </pre>
+        </div>
+    </body>
+</html>
