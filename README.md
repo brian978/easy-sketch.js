@@ -3,6 +3,9 @@ easy-sketch.js
 
 easy-sketch.js allows you to draw on canvas without having to dig into the HTML 5 API.
 
+A demo can be found here: http://brian.hopto.org/easy-sketch.js/
+
+
 Dependencies
 -------------------
 - HTML 5
