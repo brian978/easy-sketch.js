@@ -253,10 +253,9 @@ EasySketch.Sketch.prototype.__paint = function (e, pos) {
 
 /**
  *
- * @param {Event} e
  * @returns {EasySketch.Sketch}
  */
-EasySketch.Sketch.prototype.__stopPainting = function (e) {
+EasySketch.Sketch.prototype.__stopPainting = function () {
     "use strict";
 
     // Adding some CSS in the mix

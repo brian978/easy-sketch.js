@@ -9,10 +9,12 @@
 $(function () {
     var sketcher = new EasySketch.Sketch("#drawing-canvas");
 
+    // Disables the eraser
     $('#pencil').on('click', function () {
         sketcher.enableEraser(false);
     });
 
+    // Enables the eraser
     $('#eraser').on('click', function () {
         sketcher.enableEraser(true);
     });
