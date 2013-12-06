@@ -1,4 +1,4 @@
-FreeDrawingOnCanvas
+easy-sketch.js
 ===================
 
-A simple class that facilitates free drawing on the HTML 5 canvas.
+easy-sketch.js allows you to draw on canvas without having to dig into the HTML 5 API.
