@@ -33,4 +33,25 @@ $(function () {
         var lineColor = $(this).val();
         sketcher.setOptions({color: lineColor});
     });
+
+    // Getting the default color
+    var defaultColor = sketcher.getOption('color');
+    sketcher.context.font = "normal 20px Calibri";
+    sketcher.context.fillText("Default brush color: " + defaultColor, 200, 50);
+
+    // Predefined line
+    sketcher.drawLine([
+        {
+            x: 10,
+            y: 10
+        },
+        {
+            x: 20,
+            y: 50
+        },
+        {
+            x: 40,
+            y: 10
+        }
+    ])
 });
