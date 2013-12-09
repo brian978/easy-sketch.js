@@ -310,10 +310,10 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
     this.context.save();
 
     if (this.eraser) {
-        color = "rgba(0,0,0,0)";
+        color = "#000000";
         // We do a save first to keep the previous globalCompositionOperation
         this.context.save();
-        this.context.globalCompositeOperation = "copy";
+        this.context.globalCompositeOperation = "destination-out";
     }
 
     // Applying our requirements
