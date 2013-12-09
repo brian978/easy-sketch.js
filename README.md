@@ -78,3 +78,9 @@ By default, when the object is created, a series of listeners are attached on th
 binding. You can remove those listeners by calling the detachListeners() method:
 
     sketcher.detachListeners();
+    
+
+Known issues
+-----------------------
+
+For some reason the erase functionality does not work in Firefox and another way to do it needs to be found. The cause of this is that Firefox does not recognize the "copy" value for the globalCompositeOperation option from the context.
