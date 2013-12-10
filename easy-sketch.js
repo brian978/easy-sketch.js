@@ -422,7 +422,7 @@ EasySketch.Sketch.prototype.drawLine = function (pointsArray) {
     "use strict";
 
     var points = pointsArray.slice();
-    var coordinates = points[0];
+    var coordinates = points.shift();
 
     // Executing the drawing operations
     this.__contextSetup();
@@ -432,7 +432,6 @@ EasySketch.Sketch.prototype.drawLine = function (pointsArray) {
         coordinates = points.shift();
         this.context.lineTo(coordinates.x, coordinates.y);
     }
-    this.context.closePath();
     this.context.stroke();
     this.__contextRestore();
 
