@@ -54,6 +54,7 @@ EasySketch.Sketch = function (element, options) {
     var $this = this;
 
     this.listeners = {};
+    this.lastMouse = {x: 0, y: 0};
     this.disabled = false;
     this.binded = false;
     this.drawing = false;
@@ -130,6 +131,7 @@ EasySketch.Sketch.prototype.getEventManager = function () {
  *
  * @param {*} element
  * @returns {*}
+ * @private
  */
 EasySketch.Sketch.prototype.__createCanvas = function (element) {
     "use strict";
@@ -285,30 +287,16 @@ EasySketch.Sketch.prototype.enableEraser = function (value) {
 
 /**
  *
- * @param {Event=null} e
- * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
  * @returns {EasySketch.Sketch}
+ * @private
  */
-EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
-    "use strict";
-
-    if (this.drawing === true || this.disabled === true) {
-        return this;
-    }
-
-    // Adding some CSS in the mix
-    this.canvas.css('cursor', 'pointer');
-
-    // Getting to information
-    var mouse = pos || this.getPointerPosition(e);
+EasySketch.Sketch.prototype.__contextSetup = function () {
     var color = this.options.color;
-
-    // Setting the flag first
-    this.drawing = true;
 
     // Saving first to avoid changing other stuff
     this.context.save();
 
+    // Converting the pencil to an eraser
     if (this.eraser) {
         color = "#000000";
         // We do a save first to keep the previous globalCompositionOperation
@@ -322,9 +310,22 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
     this.context.lineCap = "round";
     this.context.lineJoin = "round";
 
-    // Beginning the path
-    this.context.beginPath();
-    this.context.moveTo(mouse.x, mouse.y);
+    return this;
+};
+
+/**
+ *
+ * @returns {EasySketch.Sketch}
+ * @private
+ */
+EasySketch.Sketch.prototype.__contextRestore = function () {
+    // First call is to restore colors and other stuff
+    this.context.restore();
+
+    // Restore is called twice to also restore the globalCompositionOperation (when the eraser is active)
+    if (this.eraser) {
+        this.context.restore();
+    }
 
     return this;
 };
@@ -334,6 +335,39 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
  * @param {Event=null} e
  * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
  * @returns {EasySketch.Sketch}
+ * @private
+ */
+EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
+    "use strict";
+
+    if (this.drawing === true || this.disabled === true) {
+        return this;
+    }
+
+    // Adding some CSS in the mix
+    this.canvas.css('cursor', 'pointer');
+
+    // Getting to information
+    var mouse = pos || this.getPointerPosition(e);
+
+    // Setting the flag first
+    this.drawing = true;
+
+    // Setting up the context with our requirements
+    this.__contextSetup();
+
+    // Storing the current mouse position so we can draw later
+    this.lastMouse = mouse;
+
+    return this;
+};
+
+/**
+ *
+ * @param {Event=null} e
+ * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
+ * @returns {EasySketch.Sketch}
+ * @private
  */
 EasySketch.Sketch.prototype.__draw = function (e, pos) {
     "use strict";
@@ -345,8 +379,14 @@ EasySketch.Sketch.prototype.__draw = function (e, pos) {
     var mouse = pos || this.getPointerPosition(e);
 
     // Adding a new point to the path
+    this.context.beginPath();
+    this.context.moveTo(this.lastMouse.x, this.lastMouse.y);
     this.context.lineTo(mouse.x, mouse.y);
+    this.context.closePath();
     this.context.stroke();
+
+    // Updating the last mouse position
+    this.lastMouse = mouse;
 
     return this;
 };
@@ -354,6 +394,7 @@ EasySketch.Sketch.prototype.__draw = function (e, pos) {
 /**
  *
  * @returns {EasySketch.Sketch}
+ * @private
  */
 EasySketch.Sketch.prototype.__stopDrawing = function () {
     "use strict";
@@ -366,9 +407,8 @@ EasySketch.Sketch.prototype.__stopDrawing = function () {
     // Adding some CSS in the mix
     this.canvas.css('cursor', 'auto');
 
-    // Restore is called twice to also restore the globalCompositionOperation
-    this.context.restore();
-    this.context.restore();
+    // Restoring
+    this.__contextRestore();
 
     return this;
 };
@@ -385,13 +425,16 @@ EasySketch.Sketch.prototype.drawLine = function (pointsArray) {
     var coordinates = points[0];
 
     // Executing the drawing operations
-    this.__startDrawing(null, coordinates);
+    this.__contextSetup();
+    this.context.beginPath();
+    this.context.moveTo(coordinates.x, coordinates.y);
     while (points.length > 0) {
         coordinates = points.shift();
         this.context.lineTo(coordinates.x, coordinates.y);
     }
+    this.context.closePath();
     this.context.stroke();
-    this.__stopDrawing();
+    this.__contextRestore();
 
     return this;
 };
