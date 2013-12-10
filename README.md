@@ -54,15 +54,15 @@ or with the default changed
     sketcher.getOption("some option", "value to return if option is not found");
 
 
-### Painting without user input
+### Drawing without user input
 
-The object also comes with it's own event manager that allows you to trigger the 3 main events (paint start, paint, paint stop) without the user's input. To trigger the events you can do something like this:
+The object also comes with it's own event manager that allows you to trigger the 3 main events (draw start, draw, draw stop) without the user's input. To trigger the events you can do something like this:
 
-    sketcher.getEventManager().trigger(EasySketch.Sketch.START_PAINTING_EVENT, [{x: 10, y: 10}]);
-    sketcher.getEventManager().trigger(EasySketch.Sketch.PAINT_EVENT, [{x: 10, y: 10}]);
-    sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_PAINTING_EVENT);
+    sketcher.getEventManager().trigger(EasySketch.Sketch.START_DRAWING_EVENT, [{x: 10, y: 10}]);
+    sketcher.getEventManager().trigger(EasySketch.Sketch.DRAW_EVENT, [{x: 10, y: 10}]);
+    sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_DRAWING_EVENT);
 
-As you can see the first 2 triggered events have a second parameter which is an array with a single element. The element is used to tell the sketcher where to start the painting and where to paint the next point.
+As you can see the first 2 triggered events have a second parameter which is an array with a single element. The element is used to tell the sketcher where to start the drawing and where to paint the next point.
 
 ### Setting a custom object to bind to
 
@@ -78,7 +78,7 @@ By default, when the object is created, a series of listeners are attached on th
 binding. You can remove those listeners by calling the detachListeners() method:
 
     sketcher.detachListeners();
-    
+
 
 Known issues
 -----------------------

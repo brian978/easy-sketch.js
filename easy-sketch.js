@@ -18,10 +18,17 @@ EasySketch.EventManager = function (binding) {
         /**
          *
          * @param {String} eventType
-         * @param {Array|Object=null} params
+         * @param {Array=null} params
          */
         trigger: function (eventType, params) {
-            $this.manager.trigger(eventType, params || null);
+            params = params || [];
+
+            if (params instanceof Array) {
+                // The last parameter will let the listener know it was called via the event manager
+                params.push(true);
+
+                $this.manager.trigger(eventType, params);
+            }
         },
         /**
          *
@@ -53,7 +60,7 @@ EasySketch.Sketch = function (element, options) {
     "use strict";
     var $this = this;
 
-    this.listeners = {};
+    this.listeners = [];
     this.lastMouse = {x: 0, y: 0};
     this.disabled = false;
     this.binded = false;
@@ -73,19 +80,22 @@ EasySketch.Sketch = function (element, options) {
         this.setOptions(options);
     }
 
+    // This has nothing to do with the attaching of the listeners
+    this.__registerListeners();
+
     if (this.options.autoBind === true) {
         this.attachListeners();
     }
 };
 
 // Listened events
-EasySketch.Sketch.START_PAINTING_EVENT = 'sketch.start';
-EasySketch.Sketch.PAINT_EVENT = 'sketch.paint';
-EasySketch.Sketch.STOP_PAINTING_EVENT = 'sketch.stop';
+EasySketch.Sketch.START_DRAW_EVENT = 'sketch.start';
+EasySketch.Sketch.DRAW_EVENT = 'sketch.draw';
+EasySketch.Sketch.STOP_DRAWING_EVENT = 'sketch.stop';
 
 // Triggered events
 EasySketch.Sketch.NOTIFY_START_EVENT = 'notify.start';
-EasySketch.Sketch.NOTIFY_PAINT_EVENT = 'notify.paint';
+EasySketch.Sketch.NOTIFY_DRAW_EVENT = 'notify.draw';
 EasySketch.Sketch.NOTIFY_STOP_EVENT = 'notify.stop';
 
 /**
@@ -162,6 +172,47 @@ EasySketch.Sketch.prototype.__createCanvas = function (element) {
 /**
  *
  * @returns {EasySketch.Sketch}
+ * @private
+ */
+EasySketch.Sketch.prototype.__registerListeners = function () {
+    this.listeners.push({
+        type: 'start',
+        callback: this.__startDrawing.bind(this)
+    });
+
+    this.listeners.push({
+        type: 'draw',
+        callback: this.__draw.bind(this)
+    });
+
+    this.listeners.push({
+        type: 'stop',
+        callback: this.__stopDrawing.bind(this)
+    });
+
+    return this;
+};
+
+/**
+ *
+ * @returns {Object}
+ * @private
+ */
+EasySketch.Sketch.prototype.__getBindObject = function () {
+    // Selecting the object to bind on
+    var bindingObject;
+    if (this.getOption("bindingObject") !== null) {
+        bindingObject = this.options["bindingObject"];
+    } else {
+        bindingObject = this.canvas;
+    }
+
+    return bindingObject;
+};
+
+/**
+ *
+ * @returns {EasySketch.Sketch}
  */
 EasySketch.Sketch.prototype.attachListeners = function () {
     "use strict";
@@ -173,47 +224,29 @@ EasySketch.Sketch.prototype.attachListeners = function () {
     this.binded = true;
 
     // Selecting the object to bind on
-    var bindingObject;
-    if (this.getOption("bindingObject") !== null) {
-        bindingObject = this.options["bindingObject"];
-    } else {
-        bindingObject = this.canvas;
+    var bindingObject = this.__getBindObject();
+
+    // Attaching the listeners
+    var specs;
+    for (var idx in this.listeners) {
+        specs = this.listeners[idx];
+        switch (specs.type) {
+            case "start":
+                bindingObject.on('mousedown touchstart', specs.callback);
+                this.events.attach(EasySketch.Sketch.START_DRAW_EVENT, specs.callback);
+                break;
+
+            case "draw":
+                bindingObject.on('mousemove touchmove', specs.callback);
+                this.events.attach(EasySketch.Sketch.DRAW_EVENT, specs.callback);
+                break;
+
+            case "stop":
+                bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', specs.callback);
+                this.events.attach(EasySketch.Sketch.STOP_DRAWING_EVENT, specs.callback);
+                break;
+        }
     }
-
-    // Something to avoid duplicates
-    var $this = this;
-    var start = this.__startDrawing.bind(this);
-    var draw = this.__draw.bind(this);
-    var stop = this.__stopDrawing.bind(this);
-
-    // These are a bit special since they add some extra information
-    this.listeners.start = function (e) {
-        if ($this.disabled === false) {
-            $this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_START_EVENT);
-            start.apply($this, arguments);
-        }
-
-    };
-    this.listeners.draw = function (e) {
-        if ($this.disabled === false) {
-            $this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_PAINT_EVENT);
-            draw.apply($this, arguments);
-        }
-    };
-    this.listeners.stop = function (e) {
-        $this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_STOP_EVENT);
-        stop.apply($this, arguments);
-    };
-
-    // Canvas listeners
-    bindingObject.on('mousedown touchstart', this.listeners.start);
-    bindingObject.on('mousemove touchmove', this.listeners.draw);
-    bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', this.listeners.stop);
-
-    // Event manager listeners
-    this.events.attach(EasySketch.Sketch.START_PAINTING_EVENT, start);
-    this.events.attach(EasySketch.Sketch.PAINT_EVENT, draw);
-    this.events.attach(EasySketch.Sketch.STOP_PAINTING_EVENT, stop);
 
     return this;
 };
@@ -232,28 +265,30 @@ EasySketch.Sketch.prototype.detachListeners = function () {
 
     this.binded = false;
 
-    // Selecting the object to bind on
-    var bindingObject;
-    if (this.getOption("bindingObject") !== null) {
-        bindingObject = this.options["bindingObject"];
-    } else {
-        bindingObject = this.canvas;
+    // Selecting the object to bind off
+    var bindingObject = this.__getBindObject();
+
+    // Detaching the listeners
+    var specs;
+    for (var idx in this.listeners) {
+        specs = this.listeners[idx];
+        switch (specs.type) {
+            case "start":
+                bindingObject.off('mousedown touchstart', specs.callback);
+                this.events.detach(EasySketch.Sketch.START_DRAW_EVENT, specs.callback);
+                break;
+
+            case "draw":
+                bindingObject.off('mousemove touchmove', specs.callback);
+                this.events.detach(EasySketch.Sketch.DRAW_EVENT, specs.callback);
+                break;
+
+            case "stop":
+                bindingObject.off('mouseup mouseleave mouseout touchend touchcancel', specs.callback);
+                this.events.detach(EasySketch.Sketch.STOP_DRAWING_EVENT, specs.callback);
+                break;
+        }
     }
-
-    // Something to avoid duplicates
-    var startPainting = this.__startDrawing.bind(this);
-    var paint = this.__draw.bind(this);
-    var stopPainting = this.__stopDrawing.bind(this);
-
-    // Canvas listeners
-    bindingObject.off('mousedown touchstart', this.listeners.start);
-    bindingObject.off('mousemove touchmove', this.listeners.draw);
-    bindingObject.off('mouseup mouseleave mouseout touchend touchcancel', this.listeners.stop);
-
-    // Event manager listeners
-    this.events.detach(EasySketch.Sketch.START_PAINTING_EVENT, startPainting);
-    this.events.detach(EasySketch.Sketch.PAINT_EVENT, paint);
-    this.events.detach(EasySketch.Sketch.STOP_PAINTING_EVENT, stopPainting);
 
     return this;
 };
@@ -334,11 +369,13 @@ EasySketch.Sketch.prototype.__contextRestore = function () {
  *
  * @param {Event=null} e
  * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
+ * @param {Boolean=null} viaEventManager
  * @returns {EasySketch.Sketch}
  * @private
  */
-EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
+EasySketch.Sketch.prototype.__startDrawing = function (e, pos, viaEventManager) {
     "use strict";
+    viaEventManager = viaEventManager || null;
 
     if (this.drawing === true || this.disabled === true) {
         return this;
@@ -347,7 +384,7 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
     // Adding some CSS in the mix
     this.canvas.css('cursor', 'pointer');
 
-    // Getting to information
+    // Getting some information
     var mouse = pos || this.getPointerPosition(e);
 
     // Setting the flag first
@@ -359,6 +396,11 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
     // Storing the current mouse position so we can draw later
     this.lastMouse = mouse;
 
+    // Sending a notification
+    if (viaEventManager === null) {
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_START_EVENT, [mouse]);
+    }
+
     return this;
 };
 
@@ -366,16 +408,19 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
  *
  * @param {Event=null} e
  * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
+ * @param {Boolean=null} viaEventManager
  * @returns {EasySketch.Sketch}
  * @private
  */
-EasySketch.Sketch.prototype.__draw = function (e, pos) {
+EasySketch.Sketch.prototype.__draw = function (e, pos, viaEventManager) {
     "use strict";
+    viaEventManager = viaEventManager || null;
 
     if (this.drawing === false || this.disabled === true) {
         return this;
     }
 
+    // Getting some information
     var mouse = pos || this.getPointerPosition(e);
 
     // Adding a new point to the path
@@ -388,16 +433,24 @@ EasySketch.Sketch.prototype.__draw = function (e, pos) {
     // Updating the last mouse position
     this.lastMouse = mouse;
 
+    // Sending a notification
+    if (viaEventManager === null) {
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_DRAW_EVENT, [mouse]);
+    }
+
     return this;
 };
 
 /**
  *
+ * @param {Boolean=null} viaEventManager
  * @returns {EasySketch.Sketch}
  * @private
  */
-EasySketch.Sketch.prototype.__stopDrawing = function () {
+EasySketch.Sketch.prototype.__stopDrawing = function (viaEventManager) {
     "use strict";
+    viaEventManager = viaEventManager || null;
+
     if (this.drawing === false) {
         return this;
     }
@@ -409,6 +462,11 @@ EasySketch.Sketch.prototype.__stopDrawing = function () {
 
     // Restoring
     this.__contextRestore();
+
+    // Sending a notification
+    if (viaEventManager === null) {
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_STOP_EVENT);
+    }
 
     return this;
 };

@@ -54,4 +54,10 @@ $(function () {
             y: 10
         }
     ]);
+
+    // An event that is triggered when the user draws on the canvas
+    // (this does not trigger when the DRAW_EVENT is called via the event manager)
+    sketcher.getEventManager().attach(EasySketch.Sketch.NOTIFY_DRAW_EVENT, function(e, mouse){
+        console.log('drawing at ' + JSON.stringify(mouse));
+    });
 });
