@@ -18,26 +18,17 @@ EasySketch.EventManager = function (binding) {
         /**
          *
          * @param {String} eventType
-         * @param {Array=null} params
          */
-        trigger: function (eventType, params) {
-            params = params || [];
-
-            if (params instanceof Array) {
-                // The last parameter will let the listener know it was called via the event manager
-                params.push(true);
-
-                $this.manager.trigger(eventType, params);
-            }
+        trigger: function (eventType) {
+            $this.manager.trigger(eventType);
         },
         /**
          *
          * @param {String} eventType
          * @param {Function} handler
-         * @param {Array=null} data Some data that can be passed to the function call
          */
-        attach: function (eventType, handler, data) {
-            $this.manager.on(eventType, data || null, handler);
+        attach: function (eventType, handler) {
+            $this.manager.on(eventType, null, handler);
         },
         /**
          *
@@ -176,19 +167,19 @@ EasySketch.Sketch.prototype.__createCanvas = function (element) {
  */
 EasySketch.Sketch.prototype.__registerListeners = function () {
     this.listeners.push({
-        type: 'start',
-        callback: this.__startDrawing.bind(this)
-    });
+                            type: 'start',
+                            callback: this.__startDrawing.bind(this)
+                        });
 
     this.listeners.push({
-        type: 'draw',
-        callback: this.__draw.bind(this)
-    });
+                            type: 'draw',
+                            callback: this.__draw.bind(this)
+                        });
 
     this.listeners.push({
-        type: 'stop',
-        callback: this.__stopDrawing.bind(this)
-    });
+                            type: 'stop',
+                            callback: this.__stopDrawing.bind(this)
+                        });
 
     return this;
 };
