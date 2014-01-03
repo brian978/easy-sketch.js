@@ -18,19 +18,17 @@ EasySketch.EventManager = function (binding) {
         /**
          *
          * @param {String} eventType
-         * @param {Array|Object=null} params
          */
-        trigger: function (eventType, params) {
-            $this.manager.trigger(eventType, params || null);
+        trigger: function (eventType) {
+            $this.manager.trigger(eventType);
         },
         /**
          *
          * @param {String} eventType
          * @param {Function} handler
-         * @param {Array=null} data Some data that can be passed to the function call
          */
-        attach: function (eventType, handler, data) {
-            $this.manager.on(eventType, data || null, handler);
+        attach: function (eventType, handler) {
+            $this.manager.on(eventType, null, handler);
         },
         /**
          *
@@ -53,7 +51,7 @@ EasySketch.Sketch = function (element, options) {
     "use strict";
     var $this = this;
 
-    this.listeners = {};
+    this.listeners = [];
     this.lastMouse = {x: 0, y: 0};
     this.disabled = false;
     this.binded = false;
@@ -73,19 +71,22 @@ EasySketch.Sketch = function (element, options) {
         this.setOptions(options);
     }
 
+    // This has nothing to do with the attaching of the listeners
+    this.__registerListeners();
+
     if (this.options.autoBind === true) {
         this.attachListeners();
     }
 };
 
 // Listened events
-EasySketch.Sketch.START_PAINTING_EVENT = 'sketch.start';
-EasySketch.Sketch.PAINT_EVENT = 'sketch.paint';
-EasySketch.Sketch.STOP_PAINTING_EVENT = 'sketch.stop';
+EasySketch.Sketch.START_DRAW_EVENT = 'sketch.start';
+EasySketch.Sketch.DRAW_EVENT = 'sketch.draw';
+EasySketch.Sketch.STOP_DRAWING_EVENT = 'sketch.stop';
 
 // Triggered events
 EasySketch.Sketch.NOTIFY_START_EVENT = 'notify.start';
-EasySketch.Sketch.NOTIFY_PAINT_EVENT = 'notify.paint';
+EasySketch.Sketch.NOTIFY_DRAW_EVENT = 'notify.draw';
 EasySketch.Sketch.NOTIFY_STOP_EVENT = 'notify.stop';
 
 /**
@@ -162,6 +163,47 @@ EasySketch.Sketch.prototype.__createCanvas = function (element) {
 /**
  *
  * @returns {EasySketch.Sketch}
+ * @private
+ */
+EasySketch.Sketch.prototype.__registerListeners = function () {
+    this.listeners.push({
+                            type: 'start',
+                            callback: this.__startDrawing.bind(this)
+                        });
+
+    this.listeners.push({
+                            type: 'draw',
+                            callback: this.__draw.bind(this)
+                        });
+
+    this.listeners.push({
+                            type: 'stop',
+                            callback: this.__stopDrawing.bind(this)
+                        });
+
+    return this;
+};
+
+/**
+ *
+ * @returns {Object}
+ * @private
+ */
+EasySketch.Sketch.prototype.__getBindObject = function () {
+    // Selecting the object to bind on
+    var bindingObject;
+    if (this.getOption("bindingObject") !== null) {
+        bindingObject = this.options["bindingObject"];
+    } else {
+        bindingObject = this.canvas;
+    }
+
+    return bindingObject;
+};
+
+/**
+ *
+ * @returns {EasySketch.Sketch}
  */
 EasySketch.Sketch.prototype.attachListeners = function () {
     "use strict";
@@ -173,28 +215,29 @@ EasySketch.Sketch.prototype.attachListeners = function () {
     this.binded = true;
 
     // Selecting the object to bind on
-    var bindingObject;
-    if (this.getOption("bindingObject") !== null) {
-        bindingObject = this.options["bindingObject"];
-    } else {
-        bindingObject = this.canvas;
+    var bindingObject = this.__getBindObject();
+
+    // Attaching the listeners
+    var specs;
+    for (var idx in this.listeners) {
+        specs = this.listeners[idx];
+        switch (specs.type) {
+            case "start":
+                bindingObject.on('mousedown touchstart', specs.callback);
+                this.events.attach(EasySketch.Sketch.START_DRAW_EVENT, specs.callback);
+                break;
+
+            case "draw":
+                bindingObject.on('mousemove touchmove', specs.callback);
+                this.events.attach(EasySketch.Sketch.DRAW_EVENT, specs.callback);
+                break;
+
+            case "stop":
+                bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', specs.callback);
+                this.events.attach(EasySketch.Sketch.STOP_DRAWING_EVENT, specs.callback);
+                break;
+        }
     }
-
-    // Something to avoid duplicates
-    var $this = this;
-    var start = this.__startDrawing.bind(this);
-    var draw = this.__draw.bind(this);
-    var stop = this.__stopDrawing.bind(this);
-
-    // Canvas listeners
-    bindingObject.on('mousedown touchstart', start);
-    bindingObject.on('mousemove touchmove', draw);
-    bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', stop);
-
-    // Event manager listeners
-    this.events.attach(EasySketch.Sketch.START_PAINTING_EVENT, start);
-    this.events.attach(EasySketch.Sketch.PAINT_EVENT, draw);
-    this.events.attach(EasySketch.Sketch.STOP_PAINTING_EVENT, stop);
 
     return this;
 };
@@ -213,60 +256,32 @@ EasySketch.Sketch.prototype.detachListeners = function () {
 
     this.binded = false;
 
-    // Selecting the object to bind on
-    var bindingObject;
-    if (this.getOption("bindingObject") !== null) {
-        bindingObject = this.options["bindingObject"];
-    } else {
-        bindingObject = this.canvas;
-    }
+    // Selecting the object to bind off
+    var bindingObject = this.__getBindObject();
 
-    // Something to avoid duplicates
-    var startPainting = this.__startDrawing.bind(this);
-    var paint = this.__draw.bind(this);
-    var stopPainting = this.__stopDrawing.bind(this);
+    // Detaching the listeners
+    var specs;
+    for (var idx in this.listeners) {
+        specs = this.listeners[idx];
+        switch (specs.type) {
+            case "start":
+                bindingObject.off('mousedown touchstart', specs.callback);
+                this.events.detach(EasySketch.Sketch.START_DRAW_EVENT, specs.callback);
+                break;
 
-    // Canvas listeners
-    bindingObject.off('mousedown touchstart', startPainting);
-    bindingObject.off('mousemove touchmove', paint);
-    bindingObject.off('mouseup mouseleave mouseout touchend touchcancel', stopPainting);
+            case "draw":
+                bindingObject.off('mousemove touchmove', specs.callback);
+                this.events.detach(EasySketch.Sketch.DRAW_EVENT, specs.callback);
+                break;
 
-    // Event manager listeners
-    this.events.detach(EasySketch.Sketch.START_PAINTING_EVENT, startPainting);
-    this.events.detach(EasySketch.Sketch.PAINT_EVENT, paint);
-    this.events.detach(EasySketch.Sketch.STOP_PAINTING_EVENT, stopPainting);
-
-    return this;
-};
-
-/**
- *
- * @returns {number}
- */
-EasySketch.Sketch.prototype.getScale = function () {
-    var prefixes = ["-moz", "-webkit", "-o", "-ms"];
-    var property = null;
-    var propertyName = "";
-    var canvasStyle = this.canvas[0].style;
-    var scale = 1;
-
-    // Determining the property to use
-    for (var i = 0; i < prefixes.length; i++) {
-        propertyName = prefixes[i] + "-transform";
-        if (propertyName in canvasStyle) {
-            property = propertyName;
-            break;
+            case "stop":
+                bindingObject.off('mouseup mouseleave mouseout touchend touchcancel', specs.callback);
+                this.events.detach(EasySketch.Sketch.STOP_DRAWING_EVENT, specs.callback);
+                break;
         }
     }
 
-    var matrix = String(this.canvas.css(property));
-    if (matrix != "none") {
-        var regex = new RegExp("([0-9.-]+)", "g");
-        var matches = matrix.match(regex);
-        scale = matches[0];
-    }
-
-    return scale;
+    return this;
 };
 
 /**
@@ -276,13 +291,11 @@ EasySketch.Sketch.prototype.getScale = function () {
  */
 EasySketch.Sketch.prototype.getPointerPosition = function (e) {
     "use strict";
-
     var $this = this;
-    var scale = this.getScale();
 
     return {
-        x: Math.ceil((e.pageX - $this.canvas.offset().left) / scale),
-        y: Math.ceil((e.pageY - $this.canvas.offset().top) / scale)
+        x: e.pageX - $this.canvas.offset().left,
+        y: e.pageY - $this.canvas.offset().top
     }
 };
 
@@ -304,11 +317,21 @@ EasySketch.Sketch.prototype.enableEraser = function (value) {
  * @private
  */
 EasySketch.Sketch.prototype.__contextSetup = function () {
+    var color = this.options.color;
+
     // Saving first to avoid changing other stuff
     this.context.save();
 
+    // Converting the pencil to an eraser
+    if (this.eraser) {
+        color = "#000000";
+        // We do a save first to keep the previous globalCompositionOperation
+        this.context.save();
+        this.context.globalCompositeOperation = "destination-out";
+    }
+
     // Applying our requirements
-    this.context.strokeStyle = this.options.color;
+    this.context.strokeStyle = color;
     this.context.lineWidth = this.options.width;
     this.context.lineCap = "round";
     this.context.lineJoin = "round";
@@ -322,7 +345,13 @@ EasySketch.Sketch.prototype.__contextSetup = function () {
  * @private
  */
 EasySketch.Sketch.prototype.__contextRestore = function () {
+    // First call is to restore colors and other stuff
     this.context.restore();
+
+    // Restore is called twice to also restore the globalCompositionOperation (when the eraser is active)
+    if (this.eraser) {
+        this.context.restore();
+    }
 
     return this;
 };
@@ -331,11 +360,13 @@ EasySketch.Sketch.prototype.__contextRestore = function () {
  *
  * @param {Event=null} e
  * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
+ * @param {Boolean=null} viaEventManager
  * @returns {EasySketch.Sketch}
  * @private
  */
-EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
+EasySketch.Sketch.prototype.__startDrawing = function (e, pos, viaEventManager) {
     "use strict";
+    viaEventManager = viaEventManager || null;
 
     if (this.drawing === true || this.disabled === true) {
         return this;
@@ -344,10 +375,8 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
     // Adding some CSS in the mix
     this.canvas.css('cursor', 'pointer');
 
-    // Getting to information
+    // Getting some information
     var mouse = pos || this.getPointerPosition(e);
-
-    this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_START_EVENT, [mouse]);
 
     // Setting the flag first
     this.drawing = true;
@@ -358,6 +387,11 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
     // Storing the current mouse position so we can draw later
     this.lastMouse = mouse;
 
+    // Sending a notification
+    if (viaEventManager === null) {
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_START_EVENT, [mouse]);
+    }
+
     return this;
 };
 
@@ -365,27 +399,20 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
  *
  * @param {Event=null} e
  * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
+ * @param {Boolean=null} viaEventManager
  * @returns {EasySketch.Sketch}
  * @private
  */
-EasySketch.Sketch.prototype.__draw = function (e, pos) {
+EasySketch.Sketch.prototype.__draw = function (e, pos, viaEventManager) {
     "use strict";
+    viaEventManager = viaEventManager || null;
 
     if (this.drawing === false || this.disabled === true) {
         return this;
     }
 
+    // Getting some information
     var mouse = pos || this.getPointerPosition(e);
-
-    this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_PAINT_EVENT, [mouse]);
-
-    // Configuring the pen
-    if (this.eraser) {
-        // We do a save first to keep the previous globalCompositionOperation
-        this.context.save();
-        this.context.strokeStyle = "rgba(0,0,0,1)";
-        this.context.globalCompositeOperation = "destination-out";
-    }
 
     // Adding a new point to the path
     this.context.beginPath();
@@ -394,24 +421,27 @@ EasySketch.Sketch.prototype.__draw = function (e, pos) {
     this.context.closePath();
     this.context.stroke();
 
-    // Restoring the globalCompositeOperation
-    if (this.eraser) {
-        this.context.restore();
-    }
-
     // Updating the last mouse position
     this.lastMouse = mouse;
+
+    // Sending a notification
+    if (viaEventManager === null) {
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_DRAW_EVENT, [mouse]);
+    }
 
     return this;
 };
 
 /**
  *
+ * @param {Boolean=null} viaEventManager
  * @returns {EasySketch.Sketch}
  * @private
  */
-EasySketch.Sketch.prototype.__stopDrawing = function () {
+EasySketch.Sketch.prototype.__stopDrawing = function (viaEventManager) {
     "use strict";
+    viaEventManager = viaEventManager || null;
+
     if (this.drawing === false) {
         return this;
     }
@@ -424,7 +454,10 @@ EasySketch.Sketch.prototype.__stopDrawing = function () {
     // Restoring
     this.__contextRestore();
 
-    this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_STOP_EVENT);
+    // Sending a notification
+    if (viaEventManager === null) {
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_STOP_EVENT);
+    }
 
     return this;
 };
@@ -442,15 +475,6 @@ EasySketch.Sketch.prototype.drawLine = function (pointsArray) {
 
     // Executing the drawing operations
     this.__contextSetup();
-
-    // Configuring the pen
-    if (this.eraser) {
-        // We do a save first to keep the previous globalCompositionOperation
-        this.context.save();
-        this.context.strokeStyle = "rgba(0,0,0,1)";
-        this.context.globalCompositeOperation = "destination-out";
-    }
-
     this.context.beginPath();
     this.context.moveTo(coordinates.x, coordinates.y);
     while (points.length > 0) {
@@ -458,12 +482,6 @@ EasySketch.Sketch.prototype.drawLine = function (pointsArray) {
         this.context.lineTo(coordinates.x, coordinates.y);
     }
     this.context.stroke();
-
-    // Restoring the globalCompositeOperation
-    if (this.eraser) {
-        this.context.restore();
-    }
-
     this.__contextRestore();
 
     return this;
