@@ -58,11 +58,19 @@ or with the default changed
 
 The object also comes with it's own event manager that allows you to trigger the 3 main events (draw start, draw, draw stop) without the user's input. To trigger the events you can do something like this:
 
-    sketcher.getEventManager().trigger(EasySketch.Sketch.START_DRAWING_EVENT, [{x: 10, y: 10}]);
-    sketcher.getEventManager().trigger(EasySketch.Sketch.DRAW_EVENT, [{x: 10, y: 10}]);
-    sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_DRAWING_EVENT);
+    sketcher.getEventManager().trigger(EasySketch.Sketch.START_PAINTING_EVENT, [{x: 10, y: 10}]);
+    sketcher.getEventManager().trigger(EasySketch.Sketch.PAINT_EVENT, [{x: 10, y: 10}]);
+    sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_PAINTING_EVENT);
 
 As you can see the first 2 triggered events have a second parameter which is an array with a single element. The element is used to tell the sketcher where to start the drawing and where to paint the next point.
+
+### Events triggered by the class
+
+When the painting starts the *EasySketch.Sketch.NOTIFY_START_EVENT* event is triggered. The event is fired 1 parameter: an object containing the mouse position (x & y)
+
+After the painting has started and the user moves the pointer, the *EasySketch.Sketch.NOTIFY_PAINT_EVENT* event is triggered. The event is fired 1 parameter: an object containing the mouse position (x & y)
+
+When the user releases the mouse button the *EasySketch.Sketch.NOTIFY_STOP_EVENT* event is triggered. The event has no parameters.
 
 ### Setting a custom object to bind to
 
