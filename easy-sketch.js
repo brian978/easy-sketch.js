@@ -274,6 +274,11 @@ EasySketch.Sketch.prototype.getPointerPosition = function (e) {
     var $this = this;
     var scale = this.getScale();
 
+    if (e.hasOwnProperty("originalEvent") && e.originalEvent.hasOwnProperty("targetTouches")) {
+        e.pageX = e.originalEvent.targetTouches[0].pageX;
+        e.pageY = e.originalEvent.targetTouches[0].pageY;
+    }
+
     return {
         x: Math.ceil((e.pageX - $this.canvas.offset().left) / scale),
         y: Math.ceil((e.pageY - $this.canvas.offset().top) / scale)
