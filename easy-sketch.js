@@ -253,11 +253,13 @@ EasySketch.Sketch.prototype.getScale = function () {
         }
     }
 
-    var matrix = String(this.canvas.css(property));
-    if (matrix != "none") {
-        var regex = new RegExp("([0-9.-]+)", "g");
-        var matches = matrix.match(regex);
-        scale = matches[0];
+    if (property !== null) {
+        var matrix = String(this.canvas.css(property));
+        if (matrix != "none") {
+            var regex = new RegExp("([0-9.-]+)", "g");
+            var matches = matrix.match(regex);
+            scale = matches[0];
+        }
     }
 
     return scale;
