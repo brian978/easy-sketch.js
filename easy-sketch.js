@@ -244,12 +244,17 @@ EasySketch.Sketch.prototype.getScale = function () {
     var canvasStyle = this.canvas[0].style;
     var scale = 1;
 
-    // Determining the property to use
-    for (var i = 0; i < prefixes.length; i++) {
-        propertyName = prefixes[i] + "-transform";
-        if (propertyName in canvasStyle) {
-            property = propertyName;
-            break;
+    // Looking for the non-prefixed property first since it's easier
+    if ("transform" in canvasStyle) {
+        property = "transform";
+    } else {
+        // Determining the property to use
+        for (var i = 0; i < prefixes.length; i++) {
+            propertyName = prefixes[i] + "-transform";
+            if (propertyName in canvasStyle) {
+                property = propertyName;
+                break;
+            }
         }
     }
 
