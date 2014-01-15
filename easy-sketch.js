@@ -51,9 +51,7 @@ EasySketch.EventManager = function (binding) {
  */
 EasySketch.Sketch = function (element, options) {
     "use strict";
-    var $this = this;
 
-    this.listeners = {};
     this.lastMouse = {x: 0, y: 0};
     this.disabled = false;
     this.binded = false;
@@ -62,11 +60,18 @@ EasySketch.Sketch = function (element, options) {
     this.eraser = false;
     this.canvas = this.__createCanvas(element);
     this.context = this.canvas.get(0).getContext("2d");
+
     this.options = {
         color: "#000000",
         width: 5,
         bindingObject: null,
         autoBind: true
+    };
+
+    this.listeners = {
+        start: this.__startDrawing.bind(this),
+        draw: this.__draw.bind(this),
+        stop: this.__stopDrawing.bind(this)
     };
 
     if (options) {
@@ -180,21 +185,15 @@ EasySketch.Sketch.prototype.attachListeners = function () {
         bindingObject = this.canvas;
     }
 
-    // Something to avoid duplicates
-    var $this = this;
-    var start = this.__startDrawing.bind(this);
-    var draw = this.__draw.bind(this);
-    var stop = this.__stopDrawing.bind(this);
-
     // Canvas listeners
-    bindingObject.on('mousedown touchstart', start);
-    bindingObject.on('mousemove touchmove', draw);
-    bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', stop);
+    bindingObject.on('mousedown touchstart', this.listeners.start);
+    bindingObject.on('mousemove touchmove', this.listeners.draw);
+    bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', this.listeners.stop);
 
     // Event manager listeners
-    this.events.attach(EasySketch.Sketch.START_PAINTING_EVENT, start);
-    this.events.attach(EasySketch.Sketch.PAINT_EVENT, draw);
-    this.events.attach(EasySketch.Sketch.STOP_PAINTING_EVENT, stop);
+    this.events.attach(EasySketch.Sketch.START_PAINTING_EVENT, this.listeners.start);
+    this.events.attach(EasySketch.Sketch.PAINT_EVENT, this.listeners.draw);
+    this.events.attach(EasySketch.Sketch.STOP_PAINTING_EVENT, this.listeners.stop);
 
     return this;
 };
@@ -221,20 +220,15 @@ EasySketch.Sketch.prototype.detachListeners = function () {
         bindingObject = this.canvas;
     }
 
-    // Something to avoid duplicates
-    var startPainting = this.__startDrawing.bind(this);
-    var paint = this.__draw.bind(this);
-    var stopPainting = this.__stopDrawing.bind(this);
-
     // Canvas listeners
-    bindingObject.off('mousedown touchstart', startPainting);
-    bindingObject.off('mousemove touchmove', paint);
-    bindingObject.off('mouseup mouseleave mouseout touchend touchcancel', stopPainting);
+    bindingObject.off('mousedown touchstart', this.listeners.start);
+    bindingObject.off('mousemove touchmove', this.listeners.draw);
+    bindingObject.off('mouseup mouseleave mouseout touchend touchcancel', this.listeners.stop);
 
     // Event manager listeners
-    this.events.detach(EasySketch.Sketch.START_PAINTING_EVENT, startPainting);
-    this.events.detach(EasySketch.Sketch.PAINT_EVENT, paint);
-    this.events.detach(EasySketch.Sketch.STOP_PAINTING_EVENT, stopPainting);
+    this.events.detach(EasySketch.Sketch.START_PAINTING_EVENT, this.listeners.start);
+    this.events.detach(EasySketch.Sketch.PAINT_EVENT, this.listeners.draw);
+    this.events.detach(EasySketch.Sketch.STOP_PAINTING_EVENT, this.listeners.stop);
 
     return this;
 };
