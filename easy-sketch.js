@@ -428,9 +428,6 @@ EasySketch.Sketch.prototype.__stopDrawing = function () {
         return this;
     }
 
-    // To be able to handle touch events
-//    e.preventDefault();
-
     this.drawing = false;
 
     // Adding some CSS in the mix
