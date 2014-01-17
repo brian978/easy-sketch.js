@@ -347,6 +347,9 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
         return this;
     }
 
+    // To be able to handle touch events
+    e.preventDefault();
+
     // Adding some CSS in the mix
     this.canvas.css('cursor', 'pointer');
 
@@ -380,6 +383,9 @@ EasySketch.Sketch.prototype.__draw = function (e, pos) {
     if (this.drawing === false || this.disabled === true) {
         return this;
     }
+
+    // To be able to handle touch events
+    e.preventDefault();
 
     var mouse = pos || this.getPointerPosition(e);
 
@@ -421,6 +427,9 @@ EasySketch.Sketch.prototype.__stopDrawing = function () {
     if (this.drawing === false) {
         return this;
     }
+
+    // To be able to handle touch events
+    e.preventDefault();
 
     this.drawing = false;
 
