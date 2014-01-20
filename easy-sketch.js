@@ -238,7 +238,6 @@ EasySketch.Sketch.prototype.detachListeners = function () {
  * @returns {number}
  */
 EasySketch.Sketch.prototype.getScale = function () {
-    var prefixes = ["-moz", "-webkit", "-o", "-ms"];
     var property = null;
     var propertyName = "";
     var canvasStyle = this.canvas[0].style;
@@ -249,6 +248,7 @@ EasySketch.Sketch.prototype.getScale = function () {
         property = "transform";
     } else {
         // Determining the property to use
+        var prefixes = ["-moz", "-webkit", "-o", "-ms"];
         for (var i = 0; i < prefixes.length; i++) {
             propertyName = prefixes[i] + "-transform";
             if (propertyName in canvasStyle) {
