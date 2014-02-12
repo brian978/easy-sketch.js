@@ -131,7 +131,7 @@ EasySketch.Sketch = function (element, options) {
         alpha: 1,
         bindingObject: null,
         autoBind: true,
-        doubleBuffering: true
+        doubleBuffering: false
     };
 
     /**
