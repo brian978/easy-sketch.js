@@ -58,7 +58,9 @@ or with the default changed
     sketcher.getOption("some option", "value to return if option is not found");
 
 **Note:** If you want to draw lines with opacity, then I recommend you activate the **doubleBuffering** option which adds
-an extra layer that is used to buffer the line until you release the mouse click.
+an extra layer that is used to buffer the line until you release the mouse click:
+
+    sketcher.setOptions({doubleBuffering: true});
 
 ### Drawing without user input
 
