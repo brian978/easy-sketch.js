@@ -19,6 +19,11 @@ $(function () {
         sketcher.enableEraser(true);
     });
 
+    // Enables the eraser
+    $('#clear').on('click', function () {
+        sketcher.clear();
+    });
+
     $('#line-width-control').on('change', function () {
         // Adjusting the line width of the drawing
         var lineWidth = $(this).val();

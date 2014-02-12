@@ -55,7 +55,7 @@ EasySketch.Sketch = function (element, options) {
     this.drawing = false;
     this.events = new EasySketch.EventManager(this);
     this.eraser = false;
-    this.canvas = this.__createCanvas(element);
+    this.canvas = this._createCanvas(element);
     this.context = this.canvas.get(0).getContext("2d");
 
     this.options = {
@@ -67,9 +67,9 @@ EasySketch.Sketch = function (element, options) {
     };
 
     this.listeners = {
-        start: this.__startDrawing.bind(this),
-        draw: this.__draw.bind(this),
-        stop: this.__stopDrawing.bind(this)
+        start: this._startDrawing.bind(this),
+        draw: this._draw.bind(this),
+        stop: this._stopDrawing.bind(this)
     };
 
     if (options) {
@@ -134,7 +134,7 @@ EasySketch.Sketch.prototype = {
      * @returns {*}
      * @private
      */
-    __createCanvas: function (element) {
+    _createCanvas: function (element) {
         var canvas;
         var elementType = typeof element;
 
@@ -297,7 +297,7 @@ EasySketch.Sketch.prototype = {
      * @returns {EasySketch.Sketch}
      * @private
      */
-    __contextSetup: function () {
+    _contextSetup: function () {
         // Saving first to avoid changing other stuff
         this.context.save();
 
@@ -316,7 +316,7 @@ EasySketch.Sketch.prototype = {
      * @returns {EasySketch.Sketch}
      * @private
      */
-    __contextRestore: function () {
+    _contextRestore: function () {
         this.context.restore();
 
         return this;
@@ -329,7 +329,7 @@ EasySketch.Sketch.prototype = {
      * @returns {EasySketch.Sketch}
      * @private
      */
-    __startDrawing: function (e, pos) {
+    _startDrawing: function (e, pos) {
         if (this.drawing === true || this.disabled === true) {
             return this;
         }
@@ -349,7 +349,7 @@ EasySketch.Sketch.prototype = {
         this.drawing = true;
 
         // Setting up the context with our requirements
-        this.__contextSetup();
+        this._contextSetup();
 
         // Storing the current mouse position so we can draw later
         this.lastMouse = mouse;
@@ -364,7 +364,7 @@ EasySketch.Sketch.prototype = {
      * @returns {EasySketch.Sketch}
      * @private
      */
-    __draw: function (e, pos) {
+    _draw: function (e, pos) {
         if (this.drawing === false || this.disabled === true) {
             return this;
         }
@@ -407,7 +407,7 @@ EasySketch.Sketch.prototype = {
      * @returns {EasySketch.Sketch}
      * @private
      */
-    __stopDrawing: function () {
+    _stopDrawing: function () {
         if (this.drawing === false) {
             return this;
         }
@@ -418,7 +418,7 @@ EasySketch.Sketch.prototype = {
         this.canvas.css('cursor', 'auto');
 
         // Restoring
-        this.__contextRestore();
+        this._contextRestore();
 
         this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_STOP_EVENT);
 
@@ -435,7 +435,7 @@ EasySketch.Sketch.prototype = {
         var coordinates = points.shift();
 
         // Executing the drawing operations
-        this.__contextSetup();
+        this._contextSetup();
 
         // Configuring the pen
         if (this.eraser) {
@@ -458,7 +458,17 @@ EasySketch.Sketch.prototype = {
             this.context.restore();
         }
 
-        this.__contextRestore();
+        this._contextRestore();
+
+        return this;
+    },
+
+    /**
+     *
+     * @returns {EasySketch.Sketch}
+     */
+    clear: function () {
+        this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
 
         return this;
     }
