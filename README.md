@@ -35,14 +35,18 @@ By default, after you create the sketch object you are able to draw on the canva
 
 ### Pencil / eraser options
 
-For adjusting the width and color (the color can only be changed for the pencil) you can use the setOptions() method like so:
+For adjusting the width, color (the color can only be changed for the pencil) and opacity ( *alpha* option )
+you can use the setOptions() method like so:
 
-    sketcher.setOptions({width: 10, color: "#000"});
+    sketcher.setOptions({width: 10, color: "#000", alpha: 0.5});
 
 Or if you need to set them separately:
 
     sketcher.setOptions({width: 10});
     sketcher.setOptions({color: "#000"});
+    sketcher.setOptions({alpha: 0.5});
+
+The *alpha* option can take any value from 0 to 1.
 
 To get an option you can call the getOption() method with the option name you desire. By default it will return null if it does not
 find it, but that can be changed using the second parameter:
@@ -53,6 +57,8 @@ or with the default changed
 
     sketcher.getOption("some option", "value to return if option is not found");
 
+**Note:** If you want to draw lines with opacity, then I recommend you activate the **doubleBuffering** option which adds
+an extra layer that is used to buffer the line until you release the mouse click.
 
 ### Drawing without user input
 

@@ -49,23 +49,96 @@ EasySketch.EventManager = function (binding) {
  * @constructor
  */
 EasySketch.Sketch = function (element, options) {
+
+    /**
+     *
+     * @type {{x: number, y: number}}
+     * @protected
+     */
     this.lastMouse = {x: 0, y: 0};
+
+    /**
+     *
+     * @type {boolean}
+     * @protected
+     */
     this.disabled = false;
+
+    /**
+     *
+     * @type {boolean}
+     * @protected
+     */
     this.binded = false;
+
+    /**
+     *
+     * @type {boolean}
+     * @protected
+     */
     this.drawing = false;
+
+    /**
+     *
+     * @type {EasySketch.EventManager}
+     * @protected
+     */
     this.events = new EasySketch.EventManager(this);
+
+    /**
+     *
+     * @type {boolean}
+     * @protected
+     */
     this.eraser = false;
+
+    /**
+     *
+     * @type {jQuery}
+     * @protected
+     */
     this.canvas = this._createCanvas(element);
+
+    /**
+     *
+     * @type {CanvasRenderingContext2D}
+     * @protected
+     */
     this.context = this.canvas.get(0).getContext("2d");
 
+    /**
+     *
+     * @type {CanvasRenderingContext2D}
+     * @protected
+     */
+    this.overlayContext = null;
+
+    /**
+     *
+     * @type {Array}
+     * @protected
+     */
+    this.points = [];
+
+    /**
+     *
+     * @type {{color: string, width: number, alpha: number, bindingObject: jQuery, autoBind: boolean, doubleBuffering: boolean}}
+     * @protected
+     */
     this.options = {
         color: "#000000",
         width: 5,
         alpha: 1,
         bindingObject: null,
-        autoBind: true
+        autoBind: true,
+        doubleBuffering: true
     };
 
+    /**
+     *
+     * @type {{start: (function(this:EasySketch.Sketch)), draw: (function(this:EasySketch.Sketch)), stop: (function(this:EasySketch.Sketch))}}
+     * @protected
+     */
     this.listeners = {
         start: this._startDrawing.bind(this),
         draw: this._draw.bind(this),
@@ -74,6 +147,11 @@ EasySketch.Sketch = function (element, options) {
 
     if (options) {
         this.setOptions(options);
+    }
+
+    // Creating the overlay
+    if (this.options.doubleBuffering === true) {
+        this._createOverlay();
     }
 
     if (this.options.autoBind === true) {
@@ -92,6 +170,19 @@ EasySketch.Sketch.NOTIFY_PAINT_EVENT = 'notify.paint';
 EasySketch.Sketch.NOTIFY_STOP_EVENT = 'notify.stop';
 
 EasySketch.Sketch.prototype = {
+    /**
+     *
+     * @returns {CanvasRenderingContext2D}
+     * @private
+     */
+    _selectContext: function () {
+        if (this.options.doubleBuffering === true) {
+            return this.overlayContext;
+        }
+
+        return this.context;
+    },
+
     /**
      *
      * @param options
@@ -157,6 +248,34 @@ EasySketch.Sketch.prototype = {
         }
 
         return canvas;
+    },
+
+    /**
+     *
+     * @returns {EasySketch.Sketch}
+     * @private
+     */
+    _createOverlay: function () {
+        // Making sure the overlay does not go out of the container
+        this.canvas.parent().css("position", "relative");
+
+        // Creating the overlay
+        var overlay = $("<canvas></canvas>");
+        overlay.addClass("drawing-overlay");
+        overlay.attr("width", this.canvas.attr("width"));
+        overlay.attr("height", this.canvas.attr("height"));
+        overlay.css("position", "absolute");
+        overlay.css("top", 0);
+        overlay.css("left", 0);
+
+        // Adding the overlay on top of our canvas
+        this.canvas.after(overlay);
+
+        // Replacing several object to make the overlay work
+        this.options.bindingObject = overlay;
+        this.overlayContext = overlay.get(0).getContext("2d");
+
+        return this;
     },
 
     /**
@@ -294,30 +413,35 @@ EasySketch.Sketch.prototype = {
 
     /**
      *
+     * @param {CanvasRenderingContext2D=CanvasRenderingContext2D} context
      * @returns {EasySketch.Sketch}
      * @private
      */
-    _contextSetup: function () {
+    _contextSetup: function (context) {
+        context = context || this._selectContext();
+
         // Saving first to avoid changing other stuff
-        this.context.save();
+        context.save();
 
         // Applying our requirements
-        this.context.strokeStyle = this.options.color;
-        this.context.lineWidth = this.options.width;
-        this.context.globalAlpha = this.options.alpha;
-        this.context.lineCap = "round";
-        this.context.lineJoin = "round";
+        context.strokeStyle = this.options.color;
+        context.lineWidth = this.options.width;
+        context.globalAlpha = this.options.alpha;
+        context.lineCap = "round";
+        context.lineJoin = "round";
 
         return this;
     },
 
     /**
      *
+     * @param {CanvasRenderingContext2D=CanvasRenderingContext2D} context
      * @returns {EasySketch.Sketch}
      * @private
      */
-    _contextRestore: function () {
-        this.context.restore();
+    _contextRestore: function (context) {
+        context = context || this._selectContext();
+        context.restore();
 
         return this;
     },
@@ -337,22 +461,21 @@ EasySketch.Sketch.prototype = {
         // To be able to handle touch events
         e.preventDefault();
 
-        // Adding some CSS in the mix
-        this.canvas.css('cursor', 'pointer');
-
-        // Getting to information
+        // Getting the pointer position if it was not provided
         var mouse = pos || this.getPointerPosition(e);
 
-        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_START_EVENT, [mouse]);
-
-        // Setting the flag first
         this.drawing = true;
+        this.lastMouse = mouse;
 
         // Setting up the context with our requirements
         this._contextSetup();
 
-        // Storing the current mouse position so we can draw later
-        this.lastMouse = mouse;
+        // Buffering the mouse position
+        if (this.options.doubleBuffering === true) {
+            this.points.push(mouse);
+        }
+
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_START_EVENT, [mouse]);
 
         return this;
     },
@@ -374,30 +497,18 @@ EasySketch.Sketch.prototype = {
 
         var mouse = pos || this.getPointerPosition(e);
 
-        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_PAINT_EVENT, [mouse]);
+        this._drawPoints([this.lastMouse, mouse], this._selectContext());
 
-        // Configuring the pen
-        if (this.eraser) {
-            // We do a save first to keep the previous globalCompositionOperation
-            this.context.save();
-            this.context.strokeStyle = "rgba(0,0,0,1)";
-            this.context.globalCompositeOperation = "destination-out";
-        }
-
-        // Adding a new point to the path
-        this.context.beginPath();
-        this.context.moveTo(this.lastMouse.x, this.lastMouse.y);
-        this.context.lineTo(mouse.x, mouse.y);
-        this.context.closePath();
-        this.context.stroke();
-
-        // Restoring the globalCompositeOperation
-        if (this.eraser) {
-            this.context.restore();
-        }
-
-        // Updating the last mouse position
+        // The last position MUST be updated after drawing the line
         this.lastMouse = mouse;
+
+        // Redrawing the line on the overlay
+        if (this.options.doubleBuffering === true) {
+            this.points.push(mouse);
+            this._redrawBuffer();
+        }
+
+        this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_PAINT_EVENT, [mouse]);
 
         return this;
     },
@@ -420,7 +531,63 @@ EasySketch.Sketch.prototype = {
         // Restoring
         this._contextRestore();
 
+        // Flushing the buffer
+        if (this.options.doubleBuffering === true) {
+            this.drawLine(this.points);
+            this.points = [];
+            this.overlayContext.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
+        }
+
+        // Triggering the stop event
         this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_STOP_EVENT);
+
+        return this;
+    },
+
+    /**
+     *
+     * @returns {EasySketch.Sketch}
+     * @private
+     */
+    _redrawBuffer: function () {
+        this.overlayContext.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
+        this._drawPoints(this.points, this.overlayContext);
+
+        return this;
+    },
+
+    /**
+     *
+     * @param {Array} points
+     * @param {CanvasRenderingContext2D} context
+     * @returns {EasySketch.Sketch}
+     * @private
+     */
+    _drawPoints: function (points, context) {
+        points = points.slice();
+        var coordinates = points.shift();
+
+        // Configuring the pen
+        if (this.eraser) {
+            // We do a save first to keep the previous globalCompositionOperation
+            context.save();
+            context.strokeStyle = "rgba(0,0,0,1)";
+            context.globalCompositeOperation = "destination-out";
+        }
+
+        context.beginPath();
+        context.moveTo(coordinates.x, coordinates.y);
+        while (points.length > 0) {
+            coordinates = points.shift();
+            context.lineTo(coordinates.x, coordinates.y);
+        }
+        context.stroke();
+        context.closePath();
+
+        // Restoring the globalCompositeOperation
+        if (this.eraser) {
+            context.restore();
+        }
 
         return this;
     },
@@ -431,34 +598,13 @@ EasySketch.Sketch.prototype = {
      * @returns {EasySketch.Sketch}
      */
     drawLine: function (pointsArray) {
-        var points = pointsArray.slice();
-        var coordinates = points.shift();
+        // Drawing a line MUST always be done on the master canvas
+        var context = this.context;
 
         // Executing the drawing operations
-        this._contextSetup();
-
-        // Configuring the pen
-        if (this.eraser) {
-            // We do a save first to keep the previous globalCompositionOperation
-            this.context.save();
-            this.context.strokeStyle = "rgba(0,0,0,1)";
-            this.context.globalCompositeOperation = "destination-out";
-        }
-
-        this.context.beginPath();
-        this.context.moveTo(coordinates.x, coordinates.y);
-        while (points.length > 0) {
-            coordinates = points.shift();
-            this.context.lineTo(coordinates.x, coordinates.y);
-        }
-        this.context.stroke();
-
-        // Restoring the globalCompositeOperation
-        if (this.eraser) {
-            this.context.restore();
-        }
-
-        this._contextRestore();
+        this._contextSetup(context);
+        this._drawPoints(pointsArray, context);
+        this._contextRestore(context);
 
         return this;
     },
@@ -471,7 +617,13 @@ EasySketch.Sketch.prototype = {
         this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
 
         return this;
+    },
+
+    /**
+     *
+     * @returns {Object}
+     */
+    getBindObject: function () {
+        return this.options.bindingObject;
     }
 };
-
-
