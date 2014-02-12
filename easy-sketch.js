@@ -9,7 +9,6 @@
 var EasySketch = EasySketch || {};
 
 EasySketch.EventManager = function (binding) {
-    "use strict";
     var $this = this;
 
     this.manager = $(binding);
@@ -50,8 +49,6 @@ EasySketch.EventManager = function (binding) {
  * @constructor
  */
 EasySketch.Sketch = function (element, options) {
-    "use strict";
-
     this.lastMouse = {x: 0, y: 0};
     this.disabled = false;
     this.binded = false;
@@ -100,8 +97,6 @@ EasySketch.Sketch.NOTIFY_STOP_EVENT = 'notify.stop';
  * @returns {EasySketch.Sketch}
  */
 EasySketch.Sketch.prototype.setOptions = function (options) {
-    "use strict";
-
     this.options = $.extend(this.options, options || {});
 
     return this;
@@ -129,7 +124,6 @@ EasySketch.Sketch.prototype.getOption = function (name, defaultValue) {
  * @returns {EventManager|*}
  */
 EasySketch.Sketch.prototype.getEventManager = function () {
-    "use strict";
     return this.events;
 };
 
@@ -140,7 +134,6 @@ EasySketch.Sketch.prototype.getEventManager = function () {
  * @private
  */
 EasySketch.Sketch.prototype.__createCanvas = function (element) {
-    "use strict";
     var canvas;
     var elementType = typeof element;
 
@@ -170,8 +163,6 @@ EasySketch.Sketch.prototype.__createCanvas = function (element) {
  * @returns {EasySketch.Sketch}
  */
 EasySketch.Sketch.prototype.attachListeners = function () {
-    "use strict";
-
     if (this.binded === true) {
         return this;
     }
@@ -205,8 +196,6 @@ EasySketch.Sketch.prototype.attachListeners = function () {
  * @returns {EasySketch.Sketch}
  */
 EasySketch.Sketch.prototype.detachListeners = function () {
-    "use strict";
-
     if (this.binded === false) {
         return this;
     }
@@ -277,8 +266,6 @@ EasySketch.Sketch.prototype.getScale = function () {
  * @returns {{x: Number, y: Number}}
  */
 EasySketch.Sketch.prototype.getPointerPosition = function (e) {
-    "use strict";
-
     var $this = this;
     var scale = this.getScale();
 
@@ -299,7 +286,6 @@ EasySketch.Sketch.prototype.getPointerPosition = function (e) {
  * @returns {EasySketch.Sketch}
  */
 EasySketch.Sketch.prototype.enableEraser = function (value) {
-    "use strict";
     this.eraser = value;
 
     return this;
@@ -343,8 +329,6 @@ EasySketch.Sketch.prototype.__contextRestore = function () {
  * @private
  */
 EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
-    "use strict";
-
     if (this.drawing === true || this.disabled === true) {
         return this;
     }
@@ -380,8 +364,6 @@ EasySketch.Sketch.prototype.__startDrawing = function (e, pos) {
  * @private
  */
 EasySketch.Sketch.prototype.__draw = function (e, pos) {
-    "use strict";
-
     if (this.drawing === false || this.disabled === true) {
         return this;
     }
@@ -425,7 +407,6 @@ EasySketch.Sketch.prototype.__draw = function (e, pos) {
  * @private
  */
 EasySketch.Sketch.prototype.__stopDrawing = function () {
-    "use strict";
     if (this.drawing === false) {
         return this;
     }
@@ -449,8 +430,6 @@ EasySketch.Sketch.prototype.__stopDrawing = function () {
  * @returns {EasySketch.Sketch}
  */
 EasySketch.Sketch.prototype.drawLine = function (pointsArray) {
-    "use strict";
-
     var points = pointsArray.slice();
     var coordinates = points.shift();
 
