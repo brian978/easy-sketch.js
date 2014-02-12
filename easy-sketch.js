@@ -190,37 +190,6 @@ EasySketch.Sketch.prototype = {
 
         return this;
     },
-    /**
-     *
-     * @returns {EasySketch.Sketch}
-     */
-    attachListeners: function () {
-        if (this.binded === true) {
-            return this;
-        }
-
-        this.binded = true;
-
-        // Selecting the object to bind on
-        var bindingObject;
-        if (this.getOption("bindingObject") !== null) {
-            bindingObject = this.options["bindingObject"];
-        } else {
-            bindingObject = this.canvas;
-        }
-
-        // Canvas listeners
-        bindingObject.on('mousedown touchstart', this.listeners.start);
-        bindingObject.on('mousemove touchmove', this.listeners.draw);
-        bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', this.listeners.stop);
-
-        // Event manager listeners
-        this.events.attach(EasySketch.Sketch.START_PAINTING_EVENT, this.listeners.start);
-        this.events.attach(EasySketch.Sketch.PAINT_EVENT, this.listeners.draw);
-        this.events.attach(EasySketch.Sketch.STOP_PAINTING_EVENT, this.listeners.stop);
-
-        return this;
-    },
 
     /**
      * Listeners can also be detached if this is required
