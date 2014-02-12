@@ -93,3 +93,9 @@ By default, when the object is created, a series of listeners are attached on th
 binding. You can remove those listeners by calling the detachListeners() method:
 
     sketcher.detachListeners();
+
+### Clearing the canvas
+
+To clear the canvas all you need to do is call the *clear()* method:
+
+    sketcher.clear();
