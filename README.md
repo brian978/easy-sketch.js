@@ -80,6 +80,13 @@ In case you need a custom object to bind the events on, you can pass it to the c
 
 **This option CANNOT be set after the creation of the object because the method that attaches the listeners is called in the constructor.**
 
+### Manual binding
+
+Let's say that for some reason you want to attach the listeners on the object later and not when the object is created. You can
+switch to manual binding by setting the option **autoBind** to false when creating the object:
+
+    var sketcher = new EasySketch.Sketch("#someId", {autoBind: false});
+
 ### Detaching the listeners
 
 By default, when the object is created, a series of listeners are attached on the canvas or the object that was provided for
