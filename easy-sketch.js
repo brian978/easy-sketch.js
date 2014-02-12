@@ -64,6 +64,7 @@ EasySketch.Sketch = function (element, options) {
     this.options = {
         color: "#000000",
         width: 5,
+        alpha: 1,
         bindingObject: null,
         autoBind: true
     };
@@ -316,6 +317,7 @@ EasySketch.Sketch.prototype.__contextSetup = function () {
     // Applying our requirements
     this.context.strokeStyle = this.options.color;
     this.context.lineWidth = this.options.width;
+    this.context.globalAlpha = this.options.alpha;
     this.context.lineCap = "round";
     this.context.lineJoin = "round";
 

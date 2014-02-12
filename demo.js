@@ -25,7 +25,7 @@ $(function () {
         sketcher.setOptions({width: lineWidth});
 
         // Informational purposes
-        $('.line-width-controls').find('.info').html(lineWidth);
+        $('.line-width-controls').find('.info').html(lineWidth + "px");
     });
 
     $('#line-color-control').on('change', function () {
@@ -34,12 +34,22 @@ $(function () {
         sketcher.setOptions({color: lineColor});
     });
 
+    $('#line-opacity-control').on('change', function () {
+        // Adjusting the line width of the drawing
+        var lineOpacity = $(this).val();
+        sketcher.setOptions({alpha: lineOpacity});
+
+        // Informational purposes
+        $('.line-opacity-controls').find('.info').html((lineOpacity * 100) + "%");
+    });
+
     // Getting the default color
     var defaultColor = sketcher.getOption('color');
     sketcher.context.font = "normal 20px Calibri";
     sketcher.context.fillText("Default brush color: " + defaultColor, 200, 50);
 
     // Predefined line
+    sketcher.setOptions({alpha: 0.1});
     sketcher.drawLine([
         {
             x: 10,
@@ -54,6 +64,7 @@ $(function () {
             y: 10
         }
     ]);
+    sketcher.setOptions({alpha: 1});
 
     // An event that is triggered when the user draws on the canvas
     // (this does not trigger when the DRAW_EVENT is called via the event manager)

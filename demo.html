@@ -26,12 +26,17 @@
             <legend>Controls</legend>
             <div class="line-width-controls">
                 <label for="line-width-control">Line width:</label>
-                <span class="info" style="width: 15px; display: inline-block; text-align: center">5</span>
-                <input type="range" value="5" id="line-width-control" style="vertical-align: middle">
+                <span class="info" style="width: 15px; display: inline-block; text-align: center">5px</span>
+                <input type="range" value="5" id="line-width-control" style="margin-left: 20px; vertical-align: middle">
             </div>
             <div class="line-color-controls">
                 <label for="line-color-control">Line color (pencil only):</label>
                 <input type="color" value="#000" id="line-color-control" style="vertical-align: middle">
+            </div>
+            <div class="line-opacity-controls">
+                <label for="line-opacity-control">Line opacity:</label>
+                <span class="info" style="width: 15px; display: inline-block; text-align: center">100%</span>
+                <input type="range" value="1" min="0" max="1" step="0.1" id="line-opacity-control" style="margin-left: 20px; vertical-align: middle">
             </div>
         </fieldset>
         <br>
