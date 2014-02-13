@@ -1,177 +1,262 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print"/>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="javascripts/easy-sketch.js"></script>
+    <script type="text/javascript" src="javascripts/demo.js"></script>
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
     <title>Easy-sketch.js by brian978</title>
-  </head>
+</head>
 
-  <body>
-    <header>
-      <div class="inner">
+<body>
+<header>
+    <div class="inner">
         <h1>Easy-sketch.js</h1>
+
         <h2>Another free drawing JavaScript library for HTML5 canvas.</h2>
-        <a href="https://github.com/brian978/easy-sketch.js" class="button"><small>View project on</small>GitHub</a>
-      </div>
-    </header>
+        <a href="https://github.com/brian978/easy-sketch.js" class="button">
+            <small>View project on</small>
+            GitHub</a>
+    </div>
+</header>
 
-    <div id="content-wrapper">
-      <div class="inner clearfix">
+<div id="content-wrapper">
+    <div class="inner clearfix">
         <section id="main-content">
-          <h1>
-<a name="easy-sketchjs" class="anchor" href="#easy-sketchjs"><span class="octicon octicon-link"></span></a>easy-sketch.js</h1>
+            <h1>
+                <a name="easy-sketchjs" class="anchor" href="#easy-sketchjs">
+                    <span class="octicon octicon-link"></span>
+                </a>easy-sketch.js
+            </h1>
 
-<p>easy-sketch.js allows you to do a free drawing on the canvas without having to dig into the HTML 5 canvas API.</p>
+            <p>easy-sketch.js allows you to do a free drawing on the canvas without having to dig into the HTML
+                5 canvas API.
+            </p>
 
-<h2>
-<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+            <h2>
+                <a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo
+            </h2>
 
-<ul>
-<li>HTML 5</li>
-<li>jQuery</li>
-</ul><h2>
-<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h2>
+            <p>
+                <span style="display: block;">
+                    <span style="display: inline-block; width: 90px; font-weight: bold;">Mode:</span>
+                    <button id="pencil-btn">Pencil</button>
+                    <button id="eraser-btn">Eraser</button>
+                </span>
+                <span style="display: block; margin-bottom: 10px">
+                    <span style="display: inline-block; width: 90px; font-weight: bold;">Operations:</span>
+                    <button id="clear-btn">Clear</button>
+                </span>
+                <span style="display: block;">
+                    <span style="display: block; width: 90px; font-weight: bold;">Controls:</span>
+                    <span style="display: block; width: 300px; height: 1px; border-bottom: 1px outset #f8f8f8; margin-bottom: 10px"></span>
+                    <span style="display: block" class="line-width-controls">
+                        <label for="line-width-control">Line width:</label>
+                        <span class="info" style="width: 15px; display: inline-block; text-align: center">5px</span>
+                        <input type="range" value="5" id="line-width-control" style="margin-left: 20px; vertical-align: middle">
+                    </span>
+                    <span style="display: block" class="line-color-controls">
+                        <label for="line-color-control">Line color (pencil only):</label>
+                        <input type="color" value="#000" id="line-color-control" style="vertical-align: middle">
+                    </span>
+                    <span style="display: block; margin-bottom: 20px;" class="line-opacity-controls">
+                        <label for="line-opacity-control">Line opacity:</label>
+                        <span class="info" style="width: 15px; display: inline-block; text-align: center">100%</span>
+                        <input type="range" value="1" min="0" max="1" step="0.1" id="line-opacity-control" style="margin-left: 20px; vertical-align: middle">
+                    </span>
+                </span>
+                <span id="canvas" style="display: block; position: relative; border: 1px solid grey;">
+                    <canvas id="drawing-canvas" width="688" height="500"></canvas>
+                </span>
+            </p>
 
-<p>In construction...</p>
+            <h2>
+                <a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies
+            </h2>
 
-<h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+            <ul>
+                <li>HTML 5</li>
+                <li>jQuery</li>
+            </ul>
 
-<p>To create the class all you need to do is</p>
+            <h2>
+                <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage
+            </h2>
 
-<p><code>var sketcher = new EasySketch.Sketch("#drawing-canvas", options);</code></p>
+            <p>To create the class all you need to do is</p>
 
-<ul>
-<li>the first parameter can be either a selector (class selector is not supported), element ID, jQuery object, JS object;</li>
-<li>the second parameter is optional and may be an object containing 2 properties: color, width; these parameters can also be set using the setOptions() method;</li>
-</ul><h3>
-<a name="eraser" class="anchor" href="#eraser"><span class="octicon octicon-link"></span></a>Eraser</h3>
+            <p><code>var sketcher = new EasySketch.Sketch("#drawing-canvas", options);</code></p>
 
-<p>By default, after you create the sketch object you are able to draw on the canvas. To enable the eraser (or disable if for that matter) you can call the enableEraser() method with either the value true or false to enable or disable the eraser.</p>
+            <ul>
+                <li>the first parameter can be either a selector (class selector is not supported), element ID,
+                    jQuery object, JS object;
+                </li>
+                <li>the second parameter is optional and may be an object containing 2 properties: color, width;
+                    these parameters can also be set using the setOptions() method;
+                </li>
+            </ul>
+            <h3>
+                <a name="eraser" class="anchor" href="#eraser"><span class="octicon octicon-link"></span></a>Eraser
+            </h3>
 
-<p><code>sketcher.enableEraser(true); // Eraser enabled / Pencil disabled</code>
-<code>sketcher.enableEraser(false); // Pencil enabled / Eraser disabled</code></p>
+            <p>By default, after you create the sketch object you are able to draw on the canvas. To enable the
+                eraser (or disable if for that matter) you can call the enableEraser() method with either the
+                value true or false to enable or disable the eraser.</p>
 
-<h3>
-<a name="pencil--eraser-options" class="anchor" href="#pencil--eraser-options"><span class="octicon octicon-link"></span></a>Pencil / eraser options</h3>
+            <p><code>sketcher.enableEraser(true); // Eraser enabled / Pencil disabled</code>
+                <code>sketcher.enableEraser(false); // Pencil enabled / Eraser disabled</code></p>
 
-<p>For adjusting the width, color (the color can only be changed for the pencil) and opacity ( <em>alpha</em> option )
-you can use the setOptions() method like so:</p>
+            <h3>
+                <a name="pencil--eraser-options" class="anchor" href="#pencil--eraser-options"><span class="octicon octicon-link"></span></a>Pencil
+                / eraser options</h3>
 
-<p><code>sketcher.setOptions({width: 10, color: "#000", alpha: 0.5});</code></p>
+            <p>For adjusting the width, color (the color can only be changed for the pencil) and opacity (
+                <em>alpha</em>
+                option )
+                you can use the setOptions() method like so:</p>
 
-<p>Or if you need to set them separately:</p>
+            <p><code>sketcher.setOptions({width: 10, color: "#000", alpha: 0.5});</code></p>
 
-<p><code>sketcher.setOptions({width: 10});</code>
-<code>sketcher.setOptions({color: "#000"});</code>
-<code>sketcher.setOptions({alpha: 0.5});</code></p>
+            <p>Or if you need to set them separately:</p>
 
-<p>The <em>alpha</em> option can take any value from 0 to 1.</p>
+            <p><code>sketcher.setOptions({width: 10});</code>
+                <code>sketcher.setOptions({color: "#000"});</code>
+                <code>sketcher.setOptions({alpha: 0.5});</code></p>
 
-<p>To get an option you can call the getOption() method with the option name you desire. By default it will return null if it does not
-find it, but that can be changed using the second parameter:</p>
+            <p>The <em>alpha</em> option can take any value from 0 to 1.</p>
 
-<p><code>sketcher.getOption("color");</code></p>
+            <p>To get an option you can call the getOption() method with the option name you desire. By default
+                it will return null if it does not
+                find it, but that can be changed using the second parameter:</p>
 
-<p>or with the default changed</p>
+            <p><code>sketcher.getOption("color");</code></p>
 
-<p><code>sketcher.getOption("some option", "value to return if option is not found");</code></p>
+            <p>or with the default changed</p>
 
-<p><strong>Note:</strong> If you want to draw lines with opacity, then I recommend you activate the <strong>doubleBuffering</strong> option which adds
-an extra layer that is used to buffer the line until you release the mouse click:</p>
+            <p><code>sketcher.getOption("some option", "value to return if option is not found");</code></p>
 
-<p><code>sketcher.setOptions({doubleBuffering: true});</code></p>
+            <p><strong>Note:</strong> If you want to draw lines with opacity, then I recommend you activate the
+                <strong>doubleBuffering</strong> option which adds
+                an extra layer that is used to buffer the line until you release the mouse click:</p>
 
-<h3>
-<a name="drawing-without-user-input" class="anchor" href="#drawing-without-user-input"><span class="octicon octicon-link"></span></a>Drawing without user input</h3>
+            <p><code>sketcher.setOptions({doubleBuffering: true});</code></p>
 
-<p>The object also comes with it's own event manager that allows you to trigger the 3 main events (draw start, draw, draw stop) without the user's input. To trigger the events you can do something like this:</p>
+            <h3>
+                <a name="drawing-without-user-input" class="anchor" href="#drawing-without-user-input"><span class="octicon octicon-link"></span></a>Drawing
+                without user input</h3>
 
-<p><code>sketcher.getEventManager().trigger(EasySketch.Sketch.START_PAINTING_EVENT, [{x: 10, y: 10}]);</code>
-<code>sketcher.getEventManager().trigger(EasySketch.Sketch.PAINT_EVENT, [{x: 10, y: 10}]);</code>
-<code>sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_PAINTING_EVENT);</code></p>
+            <p>The object also comes with it's own event manager that allows you to trigger the 3 main events
+                (draw start, draw, draw stop) without the user's input. To trigger the events you can do
+                something like this:</p>
 
-<p>As you can see the first 2 triggered events have a second parameter which is an array with a single element. The element is used to tell the sketcher where to start the drawing and where to paint the next point.</p>
+            <p><code>sketcher.getEventManager().trigger(EasySketch.Sketch.START_PAINTING_EVENT, [{x: 10, y:
+                10}]);</code>
+                <code>sketcher.getEventManager().trigger(EasySketch.Sketch.PAINT_EVENT, [{x: 10, y:
+                    10}]);</code>
+                <code>sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_PAINTING_EVENT);</code></p>
 
-<h3>
-<a name="events-triggered-by-the-class" class="anchor" href="#events-triggered-by-the-class"><span class="octicon octicon-link"></span></a>Events triggered by the class</h3>
+            <p>As you can see the first 2 triggered events have a second parameter which is an array with a
+                single element. The element is used to tell the sketcher where to start the drawing and where to
+                paint the next point.</p>
 
-<p>When the painting starts the <em>EasySketch.Sketch.NOTIFY_START_EVENT</em> event is triggered. The event is fired 1 parameter: an object containing the mouse position (x &amp; y)</p>
+            <h3>
+                <a name="events-triggered-by-the-class" class="anchor" href="#events-triggered-by-the-class"><span class="octicon octicon-link"></span></a>Events
+                triggered by the class</h3>
 
-<p>After the painting has started and the user moves the pointer, the <em>EasySketch.Sketch.NOTIFY_PAINT_EVENT</em> event is triggered. The event is fired 1 parameter: an object containing the mouse position (x &amp; y)</p>
+            <p>When the painting starts the <em>EasySketch.Sketch.NOTIFY_START_EVENT</em> event is triggered.
+                The event is fired 1 parameter: an object containing the mouse position (x &amp; y)</p>
 
-<p>When the user releases the mouse button the <em>EasySketch.Sketch.NOTIFY_STOP_EVENT</em> event is triggered. The event has no parameters.</p>
+            <p>After the painting has started and the user moves the pointer, the <em>EasySketch.Sketch.NOTIFY_PAINT_EVENT</em>
+                event is triggered. The event is fired 1 parameter: an object containing the mouse position (x
+                &amp; y)</p>
 
-<h3>
-<a name="setting-a-custom-object-to-bind-to" class="anchor" href="#setting-a-custom-object-to-bind-to"><span class="octicon octicon-link"></span></a>Setting a custom object to bind to</h3>
+            <p>When the user releases the mouse button the <em>EasySketch.Sketch.NOTIFY_STOP_EVENT</em> event is
+                triggered. The event has no parameters.</p>
 
-<p>In case you need a custom object to bind the events on, you can pass it to the constructor in the options:</p>
+            <h3>
+                <a name="setting-a-custom-object-to-bind-to" class="anchor" href="#setting-a-custom-object-to-bind-to"><span class="octicon octicon-link"></span></a>Setting
+                a custom object to bind to</h3>
 
-<p><code>var sketcher = new EasySketch.Sketch("#someId", {bindingObject: $("#customElement")});</code></p>
+            <p>In case you need a custom object to bind the events on, you can pass it to the constructor in the
+                options:</p>
 
-<p><strong>This option CANNOT be set after the creation of the object because the method that attaches the listeners is called in the constructor.</strong></p>
+            <p><code>var sketcher = new EasySketch.Sketch("#someId", {bindingObject:
+                $("#customElement")});</code></p>
 
-<h3>
-<a name="manual-binding" class="anchor" href="#manual-binding"><span class="octicon octicon-link"></span></a>Manual binding</h3>
+            <p><strong>This option CANNOT be set after the creation of the object because the method that
+                attaches the listeners is called in the constructor.</strong></p>
 
-<p>Let's say that for some reason you want to attach the listeners on the object later and not when the object is created. You can
-switch to manual binding by setting the option <strong>autoBind</strong> to false when creating the object:</p>
+            <h3>
+                <a name="manual-binding" class="anchor" href="#manual-binding"><span class="octicon octicon-link"></span></a>Manual
+                binding</h3>
 
-<p><code>var sketcher = new EasySketch.Sketch("#someId", {autoBind: false});</code></p>
+            <p>Let's say that for some reason you want to attach the listeners on the object later and not when
+                the object is created. You can
+                switch to manual binding by setting the option <strong>autoBind</strong> to false when creating
+                the object:</p>
 
-<h3>
-<a name="detaching-the-listeners" class="anchor" href="#detaching-the-listeners"><span class="octicon octicon-link"></span></a>Detaching the listeners</h3>
+            <p><code>var sketcher = new EasySketch.Sketch("#someId", {autoBind: false});</code></p>
 
-<p>By default, when the object is created, a series of listeners are attached on the canvas or the object that was provided for
-binding. You can remove those listeners by calling the detachListeners() method:</p>
+            <h3>
+                <a name="detaching-the-listeners" class="anchor" href="#detaching-the-listeners"><span class="octicon octicon-link"></span></a>Detaching
+                the listeners</h3>
 
-<p><code>sketcher.detachListeners();</code></p>
+            <p>By default, when the object is created, a series of listeners are attached on the canvas or the
+                object that was provided for
+                binding. You can remove those listeners by calling the detachListeners() method:</p>
 
-<h3>
-<a name="clearing-the-canvas" class="anchor" href="#clearing-the-canvas"><span class="octicon octicon-link"></span></a>Clearing the canvas</h3>
+            <p><code>sketcher.detachListeners();</code></p>
 
-<p>To clear the canvas all you need to do is call the <em>clear()</em> method:</p>
+            <h3>
+                <a name="clearing-the-canvas" class="anchor" href="#clearing-the-canvas"><span class="octicon octicon-link"></span></a>Clearing
+                the canvas</h3>
 
-<p><code>sketcher.clear();</code></p>
+            <p>To clear the canvas all you need to do is call the <em>clear()</em> method:</p>
+
+            <p><code>sketcher.clear();</code></p>
         </section>
 
         <aside id="sidebar">
-          <a href="https://github.com/brian978/easy-sketch.js/zipball/master" class="button">
-            <small>Download</small>
-            .zip file
-          </a>
-          <a href="https://github.com/brian978/easy-sketch.js/tarball/master" class="button">
-            <small>Download</small>
-            .tar.gz file
-          </a>
+            <a href="https://github.com/brian978/easy-sketch.js/zipball/master" class="button">
+                <small>Download</small>
+                .zip file
+            </a>
+            <a href="https://github.com/brian978/easy-sketch.js/tarball/master" class="button">
+                <small>Download</small>
+                .tar.gz file
+            </a>
 
-          <p class="repo-owner"><a href="https://github.com/brian978/easy-sketch.js"></a> is maintained by <a href="https://github.com/brian978">brian978</a>.</p>
+            <p class="repo-owner"><a href="https://github.com/brian978/easy-sketch.js"></a> is maintained by
+                <a href="https://github.com/brian978">brian978</a>.</p>
 
-          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+            <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the
+                Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
-      </div>
     </div>
+</div>
 
-            <script type="text/javascript">
-            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-          </script>
-          <script type="text/javascript">
-            try {
-              var pageTracker = _gat._getTracker("UA-48060390-1");
-            pageTracker._trackPageview();
-            } catch(err) {}
-          </script>
+<script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+    try {
+        var pageTracker = _gat._getTracker("UA-48060390-1");
+        pageTracker._trackPageview();
+    } catch (err) {
+    }
+</script>
 
-  </body>
+</body>
 </html>
