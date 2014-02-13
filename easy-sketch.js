@@ -176,7 +176,7 @@ EasySketch.Sketch.prototype = {
      * @private
      */
     _selectContext: function () {
-        if (this.options.doubleBuffering === true) {
+        if (this.options.doubleBuffering === true && this.eraser === false) {
             return this.overlayContext;
         }
 
@@ -471,7 +471,7 @@ EasySketch.Sketch.prototype = {
         this._contextSetup();
 
         // Buffering the mouse position
-        if (this.options.doubleBuffering === true) {
+        if (this.options.doubleBuffering === true && this.eraser === false) {
             this.points.push(mouse);
         }
 
@@ -503,7 +503,7 @@ EasySketch.Sketch.prototype = {
         this.lastMouse = mouse;
 
         // Redrawing the line on the overlay
-        if (this.options.doubleBuffering === true) {
+        if (this.options.doubleBuffering === true && this.eraser === false) {
             this.points.push(mouse);
             this._redrawBuffer();
         }
@@ -532,7 +532,7 @@ EasySketch.Sketch.prototype = {
         this._contextRestore();
 
         // Flushing the buffer
-        if (this.options.doubleBuffering === true) {
+        if (this.options.doubleBuffering === true && this.eraser === false) {
             this.drawLine(this.points);
             this.points = [];
             this.overlayContext.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
@@ -572,6 +572,7 @@ EasySketch.Sketch.prototype = {
             // We do a save first to keep the previous globalCompositionOperation
             context.save();
             context.strokeStyle = "rgba(0,0,0,1)";
+            context.globalAlpha = 1;
             context.globalCompositeOperation = "destination-out";
         }
 
