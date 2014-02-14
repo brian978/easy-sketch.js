@@ -6,8 +6,12 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  */
 
-$(function () {
-    var sketcher = new EasySketch.Sketch("#drawing-canvas", {doubleBuffering: false});
+requirejs.config({
+    baseUrl: "js/module"
+});
+
+requirejs(["EasySketch/Sketch"], function(Sketch){
+    var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: false});
 
     // Disables the eraser
     $('#pencil').on('click', function () {
@@ -56,38 +60,38 @@ $(function () {
     // Predefined line
     sketcher.setOptions({alpha: 0.1});
     sketcher.drawLine([
-                          {
-                              x: 20,
-                              y: 10
-                          },
-                          {
-                              x: 40,
-                              y: 100
-                          },
-                          {
-                              x: 60,
-                              y: 10
-                          }
-                      ]);
+        {
+            x: 20,
+            y: 10
+        },
+        {
+            x: 40,
+            y: 100
+        },
+        {
+            x: 60,
+            y: 10
+        }
+    ]);
     sketcher.drawLine([
-                          {
-                              x: 5,
-                              y: 10
-                          },
-                          {
-                              x: 15,
-                              y: 50
-                          },
-                          {
-                              x: 30,
-                              y: 10
-                          }
-                      ]);
+        {
+            x: 5,
+            y: 10
+        },
+        {
+            x: 15,
+            y: 50
+        },
+        {
+            x: 30,
+            y: 10
+        }
+    ]);
     sketcher.setOptions({alpha: 1});
 
     // An event that is triggered when the user draws on the canvas
     // (this does not trigger when the DRAW_EVENT is called via the event manager)
-    sketcher.getEventManager().attach(EasySketch.Sketch.NOTIFY_DRAW_EVENT, function (e, mouse) {
-        console.log('drawing at ' + JSON.stringify(mouse));
+    sketcher.getEventManager().attach(Sketch.NOTIFY_PAINT_EVENT, function (event) {
+        console.log('drawing at ' + JSON.stringify(event.getParam(0)));
     });
 });

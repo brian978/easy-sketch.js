@@ -2,19 +2,8 @@
 <html>
     <head>
         <title>easy-sketch.js demo</title>
-        <link rel="stylesheet" type="text/css" href="stylize/prism.css"/>
-        <script type="text/javascript" src="stylize/prism.js"></script>
         <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-        <script type="text/javascript" src="easy-sketch.js"></script>
-        <script type="text/javascript" src="demo.js" id="code"></script>
-        <script type="text/javascript">
-            $(function () {
-                $.get("demo.js", function (data) {
-                    $('code').html("\r\n" + data);
-                    Prism.highlightAll(true);
-                });
-            });
-        </script>
+        <script data-main="js/main" src="js/require.js"></script>
     </head>
     <body>
         <fieldset>
@@ -47,10 +36,5 @@
         <span id="canvas" style="float: left; border: 1px solid grey;">
             <canvas id="drawing-canvas" width="500" height="500"></canvas>
         </span>
-        <div style="display: inline-block; margin-left: 20px; max-width: 698px;">
-            <pre>
-                <code class="language-javascript" style="margin-left: 20px;"></code>
-            </pre>
-        </div>
     </body>
 </html>
