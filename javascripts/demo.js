@@ -7,7 +7,7 @@
  */
 
 $(function () {
-    var sketcher = new EasySketch.Sketch("#drawing-canvas", {doubleBuffering: false});
+    var sketcher = new EasySketch.Sketch("#drawing-canvas", {doubleBuffering: true});
 
     // Disables the eraser
     $('#pencil-btn').on('click', function () {
