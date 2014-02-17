@@ -11,7 +11,7 @@ requirejs.config({
 });
 
 requirejs(["EasySketch/Sketch"], function(Sketch){
-    var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: false});
+    var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: true});
 
     // Disables the eraser
     $('#pencil').on('click', function () {

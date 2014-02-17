@@ -6,11 +6,11 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  */
 
-define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
+define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, EventManager, Util) {
 
     /**
      *
-     * @param {*} element
+     * @param {Object} element
      * @param {Object=null} options
      * @constructor
      */
@@ -74,6 +74,13 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
 
         /**
          *
+         * @type {jQuery}
+         * @protected
+         */
+        this.overlay = null;
+
+        /**
+         *
          * @type {CanvasRenderingContext2D}
          * @protected
          */
@@ -106,9 +113,9 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
          * @protected
          */
         this.listeners = {
-            start: this._startDrawing.bind(this),
-            draw: this._draw.bind(this),
-            stop: this._stopDrawing.bind(this)
+            start: this.startDrawing.bind(this),
+            draw: this.makeDrawing.bind(this),
+            stop: this.stopDrawing.bind(this)
         };
 
         if (options) {
@@ -139,9 +146,9 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
         /**
          *
          * @returns {CanvasRenderingContext2D}
-         * @private
+         * @protected
          */
-        _selectContext: function () {
+        selectContext: function () {
             if (this.options.doubleBuffering === true && this.eraser === false) {
                 return this.overlayContext;
             }
@@ -151,11 +158,38 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
 
         /**
          *
+         * @returns {jQuery}
+         * @protected
+         */
+        selectCanvas: function () {
+            if (this.options.doubleBuffering === true) {
+                return this.overlay;
+            }
+
+            return this.canvas;
+        },
+
+        /**
+         *
          * @param options
          * @returns {EasySketch.Sketch}
          */
         setOptions: function (options) {
             this.options = $.extend(this.options, options || {});
+
+            return this;
+        },
+
+        /**
+         *
+         * @param {String} name
+         * @param {String|Number|Object} value
+         * @returns {EasySketch.Sketch}
+         */
+        setOption: function (name, value) {
+            if (typeof name == "string" && this.options.hasOwnProperty(name)) {
+                this.options[name] = value;
+            }
 
             return this;
         },
@@ -187,8 +221,8 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
 
         /**
          *
-         * @param {*} element
-         * @returns {*}
+         * @param {Object} element
+         * @returns {jQuery}
          * @private
          */
         _createCanvas: function (element) {
@@ -213,6 +247,10 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
                     break;
             }
 
+            canvas.css("position", "absolute");
+            canvas.css("top", 0);
+            canvas.css("left", 0);
+
             return canvas;
         },
 
@@ -231,8 +269,8 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
             overlay.attr("width", this.canvas.attr("width"));
             overlay.attr("height", this.canvas.attr("height"));
             overlay.css("position", "absolute");
-            overlay.css("top", 0);
-            overlay.css("left", 0);
+            overlay.css("top", this.canvas.css("top"));
+            overlay.css("left", this.canvas.css("top"));
 
             // Adding the overlay on top of our canvas
             this.canvas.after(overlay);
@@ -240,6 +278,34 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
             // Replacing several object to make the overlay work
             this.options.bindingObject = overlay;
             this.overlayContext = overlay.get(0).getContext("2d");
+            this.overlay = overlay;
+
+            return this;
+        },
+
+        /**
+         *
+         * @returns {EasySketch.Sketch}
+         * @private
+         */
+        _autoAdjustOverlay: function () {
+            this.overlay.attr("width", this.canvas.attr("width"));
+            this.overlay.attr("height", this.canvas.attr("height"));
+            this.overlay.css("position", "absolute");
+            this.overlay.css("top", this.canvas.css("top"));
+            this.overlay.css("left", this.canvas.css("top"));
+            this.overlay.css(Util.getScalePropertyName(this.canvas), Util.getScale(this.canvas));
+
+            return this;
+        },
+
+        /**
+         *
+         * @returns {EasySketch.Sketch}
+         * @private
+         */
+        _attachStandardListeners: function () {
+            this.canvas.on("DOMAttrModified", this._autoAdjustOverlay.bind(this));
 
             return this;
         },
@@ -311,49 +377,12 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
 
         /**
          *
-         * @returns {number}
-         */
-        getScale: function () {
-            var property = null;
-            var canvasStyle = this.canvas[0].style;
-            var scale = 1;
-
-            // Looking for the non-prefixed property first since it's easier
-            if ("transform" in canvasStyle) {
-                property = "transform";
-            } else {
-                // Determining the property to use
-                var prefixes = ["-moz", "-webkit", "-o", "-ms"];
-                var propertyName = "";
-                for (var i = 0; i < prefixes.length; i++) {
-                    propertyName = prefixes[i] + "-transform";
-                    if (propertyName in canvasStyle) {
-                        property = propertyName;
-                        break;
-                    }
-                }
-            }
-
-            if (property !== null) {
-                var matrix = String(this.canvas.css(property));
-                if (matrix != "none") {
-                    var regex = new RegExp("([0-9.-]+)", "g");
-                    var matches = matrix.match(regex);
-                    scale = matches[0];
-                }
-            }
-
-            return scale;
-        },
-
-        /**
-         *
          * @param {Event} e
          * @returns {{x: Number, y: Number}}
          */
         getPointerPosition: function (e) {
             var $this = this;
-            var scale = this.getScale();
+            var scale = Util.getScale(this.selectCanvas());
 
             if (e.hasOwnProperty("originalEvent") && e.originalEvent.hasOwnProperty("targetTouches")) {
                 e.pageX = e.originalEvent.targetTouches[0].pageX;
@@ -381,10 +410,10 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
          *
          * @param {CanvasRenderingContext2D=CanvasRenderingContext2D} context
          * @returns {EasySketch.Sketch}
-         * @private
+         * @protected
          */
-        _contextSetup: function (context) {
-            context = context || this._selectContext();
+        contextSetup: function (context) {
+            context = context || this.selectContext();
 
             // Saving first to avoid changing other stuff
             context.save();
@@ -403,10 +432,10 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
          *
          * @param {CanvasRenderingContext2D=CanvasRenderingContext2D} context
          * @returns {EasySketch.Sketch}
-         * @private
+         * @protected
          */
-        _contextRestore: function (context) {
-            context = context || this._selectContext();
+        contextRestore: function (context) {
+            context = context || this.selectContext();
             context.restore();
 
             return this;
@@ -417,9 +446,9 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
          * @param {Event=null} e
          * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
          * @returns {EasySketch.Sketch}
-         * @private
+         * @protected
          */
-        _startDrawing: function (e, pos) {
+        startDrawing: function (e, pos) {
             if (this.drawing === true || this.disabled === true) {
                 return this;
             }
@@ -434,7 +463,7 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
             this.lastMouse = mouse;
 
             // Setting up the context with our requirements
-            this._contextSetup();
+            this.contextSetup();
 
             // Buffering the mouse position
             if (this.options.doubleBuffering === true && this.eraser === false) {
@@ -451,9 +480,9 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
          * @param {Event=null} e
          * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
          * @returns {EasySketch.Sketch}
-         * @private
+         * @protected
          */
-        _draw: function (e, pos) {
+        makeDrawing: function (e, pos) {
             if (this.drawing === false || this.disabled === true) {
                 return this;
             }
@@ -463,7 +492,7 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
 
             var mouse = pos || this.getPointerPosition(e);
 
-            this._drawPoints([this.lastMouse, mouse], this._selectContext());
+            this.drawPoints([this.lastMouse, mouse], this.selectContext());
 
             // The last position MUST be updated after drawing the line
             this.lastMouse = mouse;
@@ -471,7 +500,7 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
             // Redrawing the line on the overlay
             if (this.options.doubleBuffering === true && this.eraser === false) {
                 this.points.push(mouse);
-                this._redrawBuffer();
+                this.redrawBuffer();
             }
 
             this.getEventManager().trigger(EasySketch.Sketch.NOTIFY_PAINT_EVENT, this, [mouse]);
@@ -482,9 +511,9 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
         /**
          *
          * @returns {EasySketch.Sketch}
-         * @private
+         * @protected
          */
-        _stopDrawing: function () {
+        stopDrawing: function () {
             if (this.drawing === false) {
                 return this;
             }
@@ -495,13 +524,13 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
             this.canvas.css('cursor', 'auto');
 
             // Restoring
-            this._contextRestore();
+            this.contextRestore();
 
             // Flushing the buffer
             if (this.options.doubleBuffering === true && this.eraser === false) {
                 this.drawLine(this.points);
                 this.points = [];
-                this.overlayContext.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
+                this.clearOverlay();
             }
 
             // Triggering the stop event
@@ -513,11 +542,11 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
         /**
          *
          * @returns {EasySketch.Sketch}
-         * @private
+         * @protected
          */
-        _redrawBuffer: function () {
-            this.overlayContext.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
-            this._drawPoints(this.points, this.overlayContext);
+        redrawBuffer: function () {
+            this.clearOverlay();
+            this.drawPoints(this.points, this.overlayContext);
 
             return this;
         },
@@ -527,9 +556,9 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
          * @param {Array} points
          * @param {CanvasRenderingContext2D} context
          * @returns {EasySketch.Sketch}
-         * @private
+         * @protected
          */
-        _drawPoints: function (points, context) {
+        drawPoints: function (points, context) {
             points = points.slice();
             var coordinates = points.shift();
 
@@ -569,9 +598,9 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
             var context = this.context;
 
             // Executing the drawing operations
-            this._contextSetup(context);
-            this._drawPoints(pointsArray, context);
-            this._contextRestore(context);
+            this.contextSetup(context);
+            this.drawPoints(pointsArray, context);
+            this.contextRestore(context);
 
             return this;
         },
@@ -588,10 +617,12 @@ define(["./EasySketch", "./EventManager"], function (EasySketch, EventManager) {
 
         /**
          *
-         * @returns {Object}
+         * @returns {EasySketch.Sketch}
          */
-        getBindObject: function () {
-            return this.options.bindingObject;
+        clearOverlay: function () {
+            this.overlayContext.clearRect(0, 0, this.overlay[0].width, this.overlay[0].height);
+
+            return this;
         }
     };
 

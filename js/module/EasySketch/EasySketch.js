@@ -7,7 +7,9 @@
  */
 
 define(function () {
-    return function EasySketch() {
+    function EasySketch() {
 
-    };
+    }
+
+    return EasySketch;
 });
