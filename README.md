@@ -10,6 +10,7 @@ Dependencies
 -------------------
 - HTML 5
 - jQuery
+- RequireJS
 
 
 Usage
@@ -42,9 +43,9 @@ you can use the setOptions() method like so:
 
 Or if you need to set them separately:
 
-    sketcher.setOptions({width: 10});
-    sketcher.setOptions({color: "#000"});
-    sketcher.setOptions({alpha: 0.5});
+    sketcher.setOption("width", 10});
+    sketcher.setOption("color", "#000"});
+    sketcher.setOption("alpha", 0.5});
 
 The *alpha* option can take any value from 0 to 1.
 
@@ -107,3 +108,7 @@ binding. You can remove those listeners by calling the detachListeners() method:
 To clear the canvas all you need to do is call the *clear()* method:
 
     sketcher.clear();
+
+You can also clear the overlay **manually** when double buffering is enabled:
+
+    sketcher.clearOverlay();
