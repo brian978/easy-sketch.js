@@ -620,7 +620,9 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          * @returns {EasySketch.Sketch}
          */
         clearOverlay: function () {
-            this.overlayContext.clearRect(0, 0, this.overlay[0].width, this.overlay[0].height);
+            if (this.overlayContext instanceof CanvasRenderingContext2D) {
+                this.overlayContext.clearRect(0, 0, this.overlay[0].width, this.overlay[0].height);
+            }
 
             return this;
         }
