@@ -9,8 +9,7 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print"/>
     <script type="text/javascript" src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script type="text/javascript" src="javascripts/easy-sketch.js"></script>
-    <script type="text/javascript" src="javascripts/demo.js"></script>
+    <script data-main="js/main" src="js/require.js"></script>
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -76,7 +75,7 @@
                         <input type="range" value="1" min="0" max="1" step="0.1" id="line-opacity-control" style="margin-left: 20px; vertical-align: middle">
                     </span>
                 </span>
-                <span id="canvas" style="display: block; position: relative; border: 1px solid grey;">
+                <span id="canvas" style="display: block; position: relative; width: 668px; height: 500px; border: 1px solid grey;">
                     <canvas id="drawing-canvas" width="688" height="500"></canvas>
                 </span>
             </p>
@@ -88,6 +87,7 @@
             <ul>
                 <li>HTML 5</li>
                 <li>jQuery</li>
+                <li>RequireJS</li>
             </ul>
 
             <h2>
