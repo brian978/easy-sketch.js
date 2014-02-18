@@ -130,6 +130,8 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
         if (this.options.autoBind === true) {
             this.attachListeners();
         }
+
+        this._attachStandardListeners();
     };
 
     // Listened events
