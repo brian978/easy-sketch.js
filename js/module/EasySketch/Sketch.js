@@ -291,7 +291,6 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          * @private
          */
         _autoAdjustOverlay: function () {
-
             if(this.overlay !== null) {
                 this.overlay.attr("width", this.canvas.attr("width"));
                 this.overlay.attr("height", this.canvas.attr("height"));
