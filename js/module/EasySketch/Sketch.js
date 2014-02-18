@@ -291,12 +291,15 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          * @private
          */
         _autoAdjustOverlay: function () {
-            this.overlay.attr("width", this.canvas.attr("width"));
-            this.overlay.attr("height", this.canvas.attr("height"));
-            this.overlay.css("position", "absolute");
-            this.overlay.css("top", this.canvas.css("top"));
-            this.overlay.css("left", this.canvas.css("top"));
-            this.overlay.css(Util.getScalePropertyName(this.canvas), Util.getScale(this.canvas));
+
+            if(this.overlay !== null) {
+                this.overlay.attr("width", this.canvas.attr("width"));
+                this.overlay.attr("height", this.canvas.attr("height"));
+                this.overlay.css("position", "absolute");
+                this.overlay.css("top", this.canvas.css("top"));
+                this.overlay.css("left", this.canvas.css("top"));
+                this.overlay.css(Util.getScalePropertyName(this.canvas), Util.getScale(this.canvas));
+            }
 
             return this;
         },
