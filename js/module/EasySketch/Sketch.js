@@ -249,9 +249,17 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
                     break;
             }
 
-            canvas.css("position", "absolute");
-            canvas.css("top", 0);
-            canvas.css("left", 0);
+            if(canvas.css("position").indexOf("absolute") === -1) {
+                canvas.css("position", "absolute");
+            }
+
+            if(isNaN(parseInt(canvas.css("top")))) {
+                canvas.css("top", 0);
+            }
+
+            if(isNaN(parseInt(canvas.css("left")))) {
+                canvas.css("left", 0);
+            }
 
             return canvas;
         },
