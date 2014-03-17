@@ -43,14 +43,18 @@ define(["./EasySketch"], function (EasySketch) {
          */
         getScale: function (object) {
             var property = this.getScalePropertyName(object);
-            var scale = 1;
+            var scale = {
+                x: 1,
+                y: 1
+            };
 
             if (property !== null) {
                 var matrix = String(object.css(property));
                 if (matrix != "none") {
                     var regex = new RegExp("([0-9.-]+)", "g");
                     var matches = matrix.match(regex);
-                    scale = matches[0];
+                    scale.x = parseFloat(matches[0]);
+                    scale.y = parseFloat(matches[3]);
                 }
             }
 
