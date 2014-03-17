@@ -300,12 +300,14 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          */
         _autoAdjustOverlay: function () {
             if(this.overlay !== null) {
+                var scale = Util.getScale(this.canvas);
+
                 this.overlay.attr("width", this.canvas.attr("width"));
                 this.overlay.attr("height", this.canvas.attr("height"));
                 this.overlay.css("position", "absolute");
                 this.overlay.css("top", this.canvas.css("top"));
                 this.overlay.css("left", this.canvas.css("top"));
-                this.overlay.css(Util.getScalePropertyName(this.canvas), Util.getScale(this.canvas));
+                this.overlay.css(Util.getScalePropertyName(this.canvas), "scale(" + scale.x + ", " + scale.y + ")");
             }
 
             return this;
@@ -402,8 +404,8 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             }
 
             return {
-                x: Math.ceil((e.pageX - $this.canvas.offset().left) / scale),
-                y: Math.ceil((e.pageY - $this.canvas.offset().top) / scale)
+                x: Math.ceil((e.pageX - $this.canvas.offset().left) / scale.x),
+                y: Math.ceil((e.pageY - $this.canvas.offset().top) / scale.y)
             }
         },
 
