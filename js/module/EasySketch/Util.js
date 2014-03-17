@@ -39,7 +39,7 @@ define(["./EasySketch"], function (EasySketch) {
         /**
          *
          * @param {jQuery} object
-         * @returns {number}
+         * @returns {{x: number, y: number}}
          */
         getScale: function (object) {
             var property = this.getScalePropertyName(object);
