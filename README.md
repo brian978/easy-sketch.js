@@ -1,7 +1,8 @@
 easy-sketch.js
 ===================
 
-easy-sketch.js allows you to draw on canvas without having to dig into the HTML 5 API. It's very easy to use, very flexible, very small (9KB - uncompressed, 5KB - compressed) and can be extended with ease if needed.
+easy-sketch.js allows you to draw on canvas without having to dig into the HTML 5 API. It's very easy to use,
+very flexible, very small (9KB compressed) and can be extended with ease if needed.
 
 A demo can be found at http://brian978.github.io/easy-sketch.js/
 

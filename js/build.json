@@ -1,0 +1,7 @@
+{
+    "baseUrl": "./modules/",
+    "optimize": "uglify",
+    "mainConfigFile": "./modules/Main/config.js",
+    "name": "./Main/app",
+    "out": "./build/easy-sketch.min.js"
+}
