@@ -134,11 +134,6 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
         this._attachStandardListeners();
     };
 
-    // Listened events
-    EasySketch.Sketch.START_PAINTING_EVENT = 'sketch.start';
-    EasySketch.Sketch.PAINT_EVENT = 'sketch.paint';
-    EasySketch.Sketch.STOP_PAINTING_EVENT = 'sketch.stop';
-
     // Triggered events
     EasySketch.Sketch.NOTIFY_START_EVENT = 'notify.start';
     EasySketch.Sketch.NOTIFY_PAINT_EVENT = 'notify.paint';
@@ -348,11 +343,6 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             bindingObject.on('mousemove touchmove', this.listeners.draw);
             bindingObject.on('mouseup mouseleave mouseout touchend touchcancel', this.listeners.stop);
 
-            // Event manager listeners
-            this.getEventManager().attach(EasySketch.Sketch.START_PAINTING_EVENT, this.listeners.start);
-            this.getEventManager().attach(EasySketch.Sketch.PAINT_EVENT, this.listeners.draw);
-            this.getEventManager().attach(EasySketch.Sketch.STOP_PAINTING_EVENT, this.listeners.stop);
-
             return this;
         },
 
@@ -380,11 +370,6 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             bindingObject.off('mousedown touchstart', this.listeners.start);
             bindingObject.off('mousemove touchmove', this.listeners.draw);
             bindingObject.off('mouseup mouseleave mouseout touchend touchcancel', this.listeners.stop);
-
-            // Event manager listeners
-            this.getEventManager().detach(EasySketch.Sketch.START_PAINTING_EVENT, this.listeners.start);
-            this.getEventManager().detach(EasySketch.Sketch.PAINT_EVENT, this.listeners.draw);
-            this.getEventManager().detach(EasySketch.Sketch.STOP_PAINTING_EVENT, this.listeners.stop);
 
             return this;
         },
@@ -457,12 +442,11 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
 
         /**
          *
-         * @param {Event=null} e
-         * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
+         * @param {Event} e
          * @returns {EasySketch.Sketch}
          * @protected
          */
-        startDrawing: function (e, pos) {
+        startDrawing: function (e) {
             if (this.drawing === true || this.disabled === true) {
                 return this;
             }
@@ -471,7 +455,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             e.preventDefault();
 
             // Getting the pointer position if it was not provided
-            var mouse = pos || this.getPointerPosition(e);
+            var mouse = this.getPointerPosition(e);
 
             this.drawing = true;
             this.lastMouse = mouse;
@@ -491,12 +475,11 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
 
         /**
          *
-         * @param {Event=null} e
-         * @param {Object=null} pos This is like a virtual mouse position when triggering this using the event manager
+         * @param {Event} e
          * @returns {EasySketch.Sketch}
          * @protected
          */
-        makeDrawing: function (e, pos) {
+        makeDrawing: function (e) {
             if (this.drawing === false || this.disabled === true) {
                 return this;
             }
@@ -504,7 +487,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             // To be able to handle touch events
             e.preventDefault();
 
-            var mouse = pos || this.getPointerPosition(e);
+            var mouse = this.getPointerPosition(e);
 
             this.drawPoints([this.lastMouse, mouse], this.selectContext());
 

@@ -2,13 +2,9 @@
  * easy-sketch.js
  *
  * @link https://github.com/brian978/easy-sketch.js
- * @copyright Copyright (c) 2013
+ * @copyright Copyright (c) 2014
  * @license Creative Commons Attribution-ShareAlike 3.0
  */
-
-requirejs.config({
-    baseUrl: "js/module"
-});
 
 requirejs(["EasySketch/Sketch"], function(Sketch){
     var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: true});

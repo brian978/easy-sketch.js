@@ -65,13 +65,23 @@ an extra layer that is used to buffer the line until you release the mouse click
 
 ### Drawing without user input
 
-The object also comes with it's own event manager that allows you to trigger the 3 main events (draw start, draw, draw stop) without the user's input. To trigger the events you can do something like this:
+To draw a line all you need to do is call the drawLine() method like so:
 
-    sketcher.getEventManager().trigger(EasySketch.Sketch.START_PAINTING_EVENT, [{x: 10, y: 10}]);
-    sketcher.getEventManager().trigger(EasySketch.Sketch.PAINT_EVENT, [{x: 10, y: 10}]);
-    sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_PAINTING_EVENT);
+    sketcher.drawLine([
+        {
+            x: 20,
+            y: 10
+        },
+        {
+            x: 40,
+            y: 100
+        },
+        {
+            x: 60,
+            y: 10
+        }
+    ]);
 
-As you can see the first 2 triggered events have a second parameter which is an array with a single element. The element is used to tell the sketcher where to start the drawing and where to paint the next point.
 
 ### Events triggered by the class
 
