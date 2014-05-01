@@ -7,5 +7,8 @@
  */
 
 requirejs.config({
-    baseUrl: "js/modules/"
+    baseUrl: "js/modules/",
+    paths: {
+        "EasySketch": "../../../src/js/modules/EasySketch"
+    }
 });
