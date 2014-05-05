@@ -383,9 +383,9 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             var $this = this;
             var scale = Util.getScale(this.selectCanvas());
 
-            if (e.hasOwnProperty("originalEvent") && e.originalEvent.hasOwnProperty("targetTouches")) {
-                e.pageX = e.originalEvent.targetTouches[0].pageX;
-                e.pageY = e.originalEvent.targetTouches[0].pageY;
+            if (e.hasOwnProperty("originalEvent") && e.originalEvent.hasOwnProperty("changedTouches") && e.originalEvent.changedTouches.length > 0) {
+                e.pageX = e.originalEvent.changedTouches[0].pageX;
+                e.pageY = e.originalEvent.changedTouches[0].pageY;
             }
 
             return {
