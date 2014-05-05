@@ -50,12 +50,12 @@
             <p>
                 <span style="display: block;">
                     <span style="display: inline-block; width: 90px; font-weight: bold;">Mode:</span>
-                    <button id="pencil-btn">Pencil</button>
-                    <button id="eraser-btn">Eraser</button>
+                    <button id="pencil">Pencil</button>
+                    <button id="eraser">Eraser</button>
                 </span>
                 <span style="display: block; margin-bottom: 10px">
                     <span style="display: inline-block; width: 90px; font-weight: bold;">Operations:</span>
-                    <button id="clear-btn">Clear</button>
+                    <button id="clear">Clear</button>
                 </span>
                 <span style="display: block;">
                     <span style="display: block; width: 90px; font-weight: bold;">Controls:</span>
@@ -151,24 +151,6 @@
                 an extra layer that is used to buffer the line until you release the mouse click:</p>
 
             <p><code>sketcher.setOptions({doubleBuffering: true});</code></p>
-
-            <h3>
-                <a name="drawing-without-user-input" class="anchor" href="#drawing-without-user-input"><span class="octicon octicon-link"></span></a>Drawing
-                without user input</h3>
-
-            <p>The object also comes with it's own event manager that allows you to trigger the 3 main events
-                (draw start, draw, draw stop) without the user's input. To trigger the events you can do
-                something like this:</p>
-
-            <p><code>sketcher.getEventManager().trigger(EasySketch.Sketch.START_PAINTING_EVENT, [{x: 10, y:
-                10}]);</code>
-                <code>sketcher.getEventManager().trigger(EasySketch.Sketch.PAINT_EVENT, [{x: 10, y:
-                    10}]);</code>
-                <code>sketcher.getEventManager().trigger(EasySketch.Sketch.STOP_PAINTING_EVENT);</code></p>
-
-            <p>As you can see the first 2 triggered events have a second parameter which is an array with a
-                single element. The element is used to tell the sketcher where to start the drawing and where to
-                paint the next point.</p>
 
             <h3>
                 <a name="events-triggered-by-the-class" class="anchor" href="#events-triggered-by-the-class"><span class="octicon octicon-link"></span></a>Events
