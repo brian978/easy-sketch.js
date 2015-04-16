@@ -184,7 +184,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          * @returns {EasySketch.Sketch}
          */
         setOption: function (name, value) {
-            if (typeof name == "string" && this.options.hasOwnProperty(name)) {
+            if (typeof name === "string" && this.options.hasOwnProperty(name)) {
                 this.options[name] = value;
             }
 
