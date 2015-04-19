@@ -36,8 +36,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          *
          * @returns {Array}
          */
-        getVisibleLines: function()
-        {
+        getVisibleLines: function () {
             return this._lines;
         },
 
@@ -46,8 +45,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          * @param {Object} line
          * @returns {AbstractAddon.UndoRedoDataStore}
          */
-        pushLine: function(line)
-        {
+        pushLine: function (line) {
             this._lines.push(line);
 
             return this;
@@ -58,16 +56,11 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          * @returns {AbstractAddon.UndoRedoDataStore}
          */
         undo: function () {
-            this._stashedLines.push(this._lines.pop());
-
-            var lines = [];
-            for(var idx in this._lines) {
-                if(this._lines.hasOwnProperty(idx) && typeof this._lines[idx] !== "undefined") {
-                    lines.push(this._lines[idx]);
-                }
+            if (this._lines.length <= 0) {
+                return this;
             }
 
-            this._lines = lines;
+            this._stashedLines.push(this._lines.pop());
 
             return this;
         },
@@ -77,16 +70,11 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          * @returns {AbstractAddon.UndoRedoDataStore}
          */
         redo: function () {
-            this._lines.push(this._stashedLines.pop());
-
-            var lines = [];
-            for(var idx in this._stashedLines) {
-                if(this._stashedLines.hasOwnProperty(idx) && typeof this._stashedLines[idx] !== "undefined") {
-                    lines.push(this._stashedLines[idx]);
-                }
+            if (this._stashedLines.length <= 0) {
+                return this;
             }
 
-            this._stashedLines = lines;
+            this._lines.push(this._stashedLines.pop());
 
             return this;
         },
@@ -95,8 +83,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          *
          * @returns {AbstractAddon.UndoRedoDataStore}
          */
-        reset: function()
-        {
+        reset: function () {
             this._lines = [];
             this._stashedLines = [];
 
