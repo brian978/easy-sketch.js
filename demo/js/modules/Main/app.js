@@ -10,8 +10,10 @@ requirejs(["EasySketch/Sketch", "EasySketch/Addon/Redo", "EasySketch/Addon/Undo"
     var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: true});
 
     // Initializing the addons
+    var undo = new UndoAddon();
+
     sketcher.registerAddon(new RedoAddon());
-    sketcher.registerAddon(new UndoAddon());
+    sketcher.registerAddon(undo);
 
     // Disables the eraser
     $('#pencil').on('click', function () {
@@ -23,9 +25,14 @@ requirejs(["EasySketch/Sketch", "EasySketch/Addon/Redo", "EasySketch/Addon/Undo"
         sketcher.enableEraser(true);
     });
 
-    // Enables the eraser
+    // Clear button
     $('#clear').on('click', function () {
         sketcher.clear();
+    });
+
+    // Undo button
+    $("#undo").on('click', function(){
+        undo.execute();
     });
 
     $('#line-width-control').on('change', function () {

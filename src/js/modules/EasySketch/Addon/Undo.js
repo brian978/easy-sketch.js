@@ -40,7 +40,7 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
          * @returns {EasySketch.Addon.AbstractAddon}
          */
         attachSketchObject: function (object) {
-            AbstractAddon.prototype.attachSketchObject(object);
+            AbstractAddon.prototype.attachSketchObject.call(this, object);
 
             object.getEventManager().attach(EasySketch.Sketch.NOTIFY_START_EVENT, this.onPaint.bind(this));
             object.getEventManager().attach(EasySketch.Sketch.NOTIFY_PAINT_EVENT, this.onPaint.bind(this));
@@ -73,6 +73,39 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
             });
 
             this._currentLine = [];
+
+            return this;
+        },
+
+        /**
+         * Executes the undo functionality
+         *
+         * @returns {AbstractAddon.Undo}
+         */
+        execute: function()
+        {
+            this._object.clear();
+
+            // Storing the drawing options so we can restore them after the redraw
+            var options = this._object.getDrawingOptions();
+
+            // Redrawing the lines
+            for(var idx in this._lines) {
+                if(this._lines.hasOwnProperty(idx)) {
+                    if(idx == (this._lines.length - 1)) {
+                        // Removing the last line so we can undo further
+                        this._lines.pop();
+
+                        break;
+                    }
+
+                    this._object.setOptions(this._lines[idx].options);
+                    this._object.drawLine(this._lines[idx].points);
+                }
+            }
+
+            // Restore
+            this._object.setOptions(options);
 
             return this;
         }
