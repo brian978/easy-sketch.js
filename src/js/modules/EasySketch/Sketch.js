@@ -118,6 +118,15 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             stop: this.stopDrawing.bind(this)
         };
 
+        /**
+         * Contains the list of addons attached to the sketcher
+         *
+         * @type {Array}
+         * @protected
+         */
+        this.addons = [];
+
+        // Setting the options
         if (options) {
             this.setOptions(options);
         }
@@ -244,15 +253,15 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
                     break;
             }
 
-            if(canvas.css("position").indexOf("absolute") === -1) {
+            if (canvas.css("position").indexOf("absolute") === -1) {
                 canvas.css("position", "absolute");
             }
 
-            if(isNaN(parseInt(canvas.css("top")))) {
+            if (isNaN(parseInt(canvas.css("top")))) {
                 canvas.css("top", 0);
             }
 
-            if(isNaN(parseInt(canvas.css("left")))) {
+            if (isNaN(parseInt(canvas.css("left")))) {
                 canvas.css("left", 0);
             }
 
@@ -294,7 +303,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          * @private
          */
         _autoAdjustOverlay: function () {
-            if(this.overlay !== null) {
+            if (this.overlay !== null) {
                 var scale = Util.getScale(this.canvas);
 
                 this.overlay.attr("width", this.canvas.attr("width"));
@@ -620,6 +629,19 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             if (this.overlayContext instanceof CanvasRenderingContext2D) {
                 this.overlayContext.clearRect(0, 0, this.overlay[0].width, this.overlay[0].height);
             }
+
+            return this;
+        },
+
+        /**
+         *
+         * @param {EasySketch.Addon.AbstractAddon} addon
+         * @returns {EasySketch.Sketch}
+         */
+        registerAddon: function (addon) {
+            this.addons.push(addon);
+
+            addon.attachSketchObject(this);
 
             return this;
         }

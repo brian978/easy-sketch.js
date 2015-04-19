@@ -6,8 +6,12 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  */
 
-requirejs(["EasySketch/Sketch"], function(Sketch){
+requirejs(["EasySketch/Sketch", "EasySketch/Addon/Redo", "EasySketch/Addon/Undo"], function(Sketch, RedoAddon, UndoAddon){
     var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: true});
+
+    // Initializing the addons
+    sketcher.registerAddon(new RedoAddon());
+    sketcher.registerAddon(new UndoAddon());
 
     // Disables the eraser
     $('#pencil').on('click', function () {

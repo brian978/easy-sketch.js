@@ -6,26 +6,21 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  */
 
-define(["./Addon"], function (EasySketchAddon) {
+define(["./AbstractAddon"], function (AbstractAddon) {
     
     /**
      * Constructor for the undo addon
-     * 
+     *
+     * @constructor
+     * @extends {EasySketch.Addon.AbstractAddon}
      * @param {EasySketch.Sketch} object The sketch object
      * @returns {void}
      */
-    EasySketchAddon.Undo = function(object) {
-        
-        /**
-         * @type EasySketch.Sketch
-         * @private
-         */
-        this._object = object;
-    };
-    
-    EasySketchAddon.Undo.prototype = {
-        
+    AbstractAddon.Undo = function(object) {
     };
 
-    return EasySketchAddon.Undo;
+    AbstractAddon.Undo.prototype = {
+    };
+
+    return AbstractAddon.Undo;
 });
