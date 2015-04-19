@@ -67,18 +67,20 @@ define(["./EasySketch"], function (EasySketch) {
          * @param {Object} parent
          * @param {Object} child
          */
-        extend: function(parent, child)
-        {
+        extend: function (parent, child) {
             // Inheriting the methods
-            for(var method in parent.prototype) {
-                if(parent.prototype.hasOwnProperty(method) && typeof parent.prototype[method] === "function") {
-                    child.prototype[method] = parent.prototype[method];
+            for (var method in parent.prototype) {
+                if (parent.prototype.hasOwnProperty(method) && typeof parent.prototype[method] === "function") {
+                    // We must not overwrite the methods in the child if they already exist
+                    if(!child.prototype.hasOwnProperty(method)) {
+                        child.prototype[method] = parent.prototype[method];
+                    }
                 }
             }
 
             // Inheriting the properties
-            for(var property in parent) {
-                if(parent.hasOwnProperty(property) && typeof parent.prototype[method] !== "function") {
+            for (var property in parent) {
+                if (parent.hasOwnProperty(property) && typeof parent.prototype[method] !== "function") {
                     child[property] = parent[property];
                 }
             }
