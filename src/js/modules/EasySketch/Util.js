@@ -69,7 +69,19 @@ define(["./EasySketch"], function (EasySketch) {
          */
         extend: function(parent, child)
         {
+            // Inheriting the methods
+            for(var method in parent.prototype) {
+                if(parent.prototype.hasOwnProperty(method) && typeof parent.prototype[method] === "function") {
+                    child.prototype[method] = parent.prototype[method];
+                }
+            }
 
+            // Inheriting the properties
+            for(var property in parent) {
+                if(parent.hasOwnProperty(property) && typeof parent.prototype[method] !== "function") {
+                    child[property] = parent[property];
+                }
+            }
         }
     };
 
