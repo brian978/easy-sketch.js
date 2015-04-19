@@ -108,6 +108,18 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
             this._object.setOptions(options);
 
             return this;
+        },
+
+        /**
+         * Resets the _lines property so no lines can be undone
+         *
+         * @returns {AbstractAddon.Undo}
+         */
+        reset: function()
+        {
+            this._lines = [];
+
+            return this;
         }
     };
 

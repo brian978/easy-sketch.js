@@ -28,6 +28,7 @@ requirejs(["EasySketch/Sketch", "EasySketch/Addon/Redo", "EasySketch/Addon/Undo"
     // Clear button
     $('#clear').on('click', function () {
         sketcher.clear();
+        undo.reset();
     });
 
     // Undo button
