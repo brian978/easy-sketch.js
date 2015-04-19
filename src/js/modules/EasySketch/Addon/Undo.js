@@ -42,9 +42,9 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
         attachSketchObject: function (object) {
             AbstractAddon.prototype.attachSketchObject(object);
 
-            object.getEventManager().attach(EasySketch.Sketch.NOTIFY_START_EVENT, this.onPaint);
-            object.getEventManager().attach(EasySketch.Sketch.NOTIFY_PAINT_EVENT, this.onPaint);
-            object.getEventManager().attach(EasySketch.Sketch.NOTIFY_STOP_EVENT, this.onStopPaint);
+            object.getEventManager().attach(EasySketch.Sketch.NOTIFY_START_EVENT, this.onPaint.bind(this));
+            object.getEventManager().attach(EasySketch.Sketch.NOTIFY_PAINT_EVENT, this.onPaint.bind(this));
+            object.getEventManager().attach(EasySketch.Sketch.NOTIFY_STOP_EVENT, this.onStopPaint.bind(this));
 
             return this;
         },
