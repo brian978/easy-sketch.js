@@ -218,6 +218,20 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
         },
 
         /**
+         * Returns the relevant options required to create a line
+         *
+         * @returns {{color: String, width: int, alpha: float}}
+         */
+        getDrawingOptions: function()
+        {
+            return {
+                color: this.options.color,
+                width: this.options.width,
+                alpha: this.options.alpha
+            };
+        },
+
+        /**
          *
          * @returns {EventManager|*}
          */

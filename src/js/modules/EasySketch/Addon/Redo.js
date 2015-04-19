@@ -13,10 +13,9 @@ define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
      *
      * @constructor
      * @extends {EasySketch.Addon.AbstractAddon}
-     * @param {EasySketch.Sketch} object The sketch object
      * @returns {void}
      */
-    AbstractAddon.Redo = function(object) {
+    AbstractAddon.Redo = function() {
     };
 
     AbstractAddon.Redo.prototype = {

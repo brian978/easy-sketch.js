@@ -16,7 +16,7 @@ define(["../EasySketch", "./Addon"], function (EasySketch, Addon) {
     EasySketch.Addon.AbstractAddon = function () {
         /**
          * @type {EasySketch.Sketch}
-         * @private
+         * @protected
          */
         this._object = null;
     };
