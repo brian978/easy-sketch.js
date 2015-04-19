@@ -13,9 +13,17 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
      *
      * @constructor
      * @extends {EasySketch.Addon.AbstractAddon}
+     * @param dataStore {EasySketch.Addon.UndoRedoDataStore}
      * @returns {void}
      */
-    AbstractAddon.Undo = function () {
+    AbstractAddon.Undo = function (dataStore) {
+        /**
+         *
+         * @type {EasySketch.Addon.UndoRedoDataStore}
+         * @private
+         */
+        this._dataStore = dataStore;
+
         /**
          * The lines the can be undone
          *
@@ -67,7 +75,7 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
          * @returns {AbstractAddon.Undo}
          */
         onStopPaint: function () {
-            this._lines.push({
+            this._dataStore.pushLine({
                 options: this._object.getDrawingOptions(),
                 points: this._currentLine
             });
@@ -86,38 +94,23 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
         {
             this._object.clear();
 
+            // Moves the last line in the redo queue
+            this._dataStore.undo();
+
             // Storing the drawing options so we can restore them after the redraw
             var options = this._object.getDrawingOptions();
 
             // Redrawing the lines
-            for(var idx in this._lines) {
-                if(this._lines.hasOwnProperty(idx)) {
-                    if(idx == (this._lines.length - 1)) {
-                        // Removing the last line so we can undo further
-                        this._lines.pop();
-
-                        break;
-                    }
-
-                    this._object.setOptions(this._lines[idx].options);
-                    this._object.drawLine(this._lines[idx].points);
+            var lines = this._dataStore.getVisibleLines();
+            for(var idx in lines) {
+                if(lines.hasOwnProperty(idx)) {
+                    this._object.setOptions(lines[idx].options);
+                    this._object.drawLine(lines[idx].points);
                 }
             }
 
             // Restore
             this._object.setOptions(options);
-
-            return this;
-        },
-
-        /**
-         * Resets the _lines property so no lines can be undone
-         *
-         * @returns {AbstractAddon.Undo}
-         */
-        reset: function()
-        {
-            this._lines = [];
 
             return this;
         }

@@ -6,14 +6,22 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  */
 
-requirejs(["EasySketch/Sketch", "EasySketch/Addon/Redo", "EasySketch/Addon/Undo"], function(Sketch, RedoAddon, UndoAddon){
+requirejs([
+    "EasySketch/Sketch",
+    "EasySketch/Addon/Redo",
+    "EasySketch/Addon/Undo",
+    "EasySketch/Addon/UndoRedoDataStore"
+], function (Sketch, RedoAddon, UndoAddon, UndoRedoDataStore) {
     var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: true});
 
     // Initializing the addons
-    var undo = new UndoAddon();
+    var urDataStore = new UndoRedoDataStore();
 
-    sketcher.registerAddon(new RedoAddon());
+    var undo = new UndoAddon(urDataStore);
+    var redo = new RedoAddon(urDataStore);
+
     sketcher.registerAddon(undo);
+    sketcher.registerAddon(redo);
 
     // Disables the eraser
     $('#pencil').on('click', function () {
@@ -28,12 +36,17 @@ requirejs(["EasySketch/Sketch", "EasySketch/Addon/Redo", "EasySketch/Addon/Undo"
     // Clear button
     $('#clear').on('click', function () {
         sketcher.clear();
-        undo.reset();
+        urDataStore.clear();
     });
 
     // Undo button
-    $("#undo").on('click', function(){
+    $("#undo").on('click', function () {
         undo.execute();
+    });
+
+    // Redo button
+    $("#redo").on('click', function () {
+        redo.execute();
     });
 
     $('#line-width-control').on('change', function () {
