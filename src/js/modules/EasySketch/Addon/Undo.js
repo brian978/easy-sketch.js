@@ -6,7 +6,7 @@
  * @license Creative Commons Attribution-ShareAlike 3.0
  */
 
-define(["./AbstractAddon"], function (AbstractAddon) {
+define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
     
     /**
      * Constructor for the undo addon
@@ -21,6 +21,8 @@ define(["./AbstractAddon"], function (AbstractAddon) {
 
     AbstractAddon.Undo.prototype = {
     };
+
+    Util.extend(AbstractAddon, AbstractAddon.Undo);
 
     return AbstractAddon.Undo;
 });

@@ -59,6 +59,17 @@ define(["./EasySketch"], function (EasySketch) {
             }
 
             return scale;
+        },
+
+        /**
+         * Extends a child object from a parent
+         *
+         * @param {Object} parent
+         * @param {Object} child
+         */
+        extend: function(parent, child)
+        {
+
         }
     };
 
