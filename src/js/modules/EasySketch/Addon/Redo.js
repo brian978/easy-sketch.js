@@ -40,14 +40,14 @@ define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
             }
 
             // Storing the drawing options so we can restore them after the redraw
-            var options = this._object.getDrawingOptions();
+            var options = this.object.getDrawingOptions();
 
             // Redrawing the lines
-            this._object.setOptions(line.options);
-            this._object.drawLine(line.points);
+            this.object.setOptions(line.options);
+            this.object.drawLine(line.points);
 
             // Restore
-            this._object.setOptions(options);
+            this.object.setOptions(options);
 
             return this;
         }

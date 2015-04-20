@@ -72,11 +72,6 @@ requirejs([
         $('.line-opacity-controls').find('.info').html((lineOpacity * 100) + "%");
     });
 
-    // Getting the default color
-    var defaultColor = sketcher.getOption('color');
-    sketcher.context.font = "normal 20px Calibri";
-    sketcher.context.fillText("Default brush color: " + defaultColor, 200, 50);
-
     // Predefined line
     sketcher.setOptions({alpha: 0.1});
     sketcher.drawLine([

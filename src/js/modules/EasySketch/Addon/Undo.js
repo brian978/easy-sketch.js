@@ -33,25 +33,25 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
          * @returns {AbstractAddon.Undo}
          */
         execute: function () {
-            this._object.clear();
+            this.object.clear();
 
             // Moves the last line in the redo queue
             this._dataStore.undo();
 
             // Storing the drawing options so we can restore them after the redraw
-            var options = this._object.getDrawingOptions();
+            var options = this.object.getDrawingOptions();
 
             // Redrawing the lines
             var lines = this._dataStore.getVisibleLines();
             for (var idx in lines) {
                 if (lines.hasOwnProperty(idx)) {
-                    this._object.setOptions(lines[idx].options);
-                    this._object.drawLine(lines[idx].points);
+                    this.object.setOptions(lines[idx].options);
+                    this.object.drawLine(lines[idx].points);
                 }
             }
 
             // Restore
-            this._object.setOptions(options);
+            this.object.setOptions(options);
 
             return this;
         }

@@ -18,7 +18,7 @@ define(["../EasySketch", "./Addon"], function (EasySketch, Addon) {
          * @type {EasySketch.Sketch}
          * @protected
          */
-        this._object = null;
+        this.object = null;
     };
 
     EasySketch.Addon.AbstractAddon.prototype = {
@@ -28,7 +28,7 @@ define(["../EasySketch", "./Addon"], function (EasySketch, Addon) {
          * @returns {EasySketch.Addon.AbstractAddon}
          */
         attachSketchObject: function (object) {
-            this._object = object;
+            this.object = object;
 
             return this;
         }
