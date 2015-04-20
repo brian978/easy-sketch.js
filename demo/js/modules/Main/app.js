@@ -15,8 +15,7 @@ requirejs([
     var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: true});
 
     // Initializing the addons
-    var urDataStore = new UndoRedoDataStore();
-
+    var urDataStore = new UndoRedoDataStore(sketcher);
     var undo = new UndoAddon(urDataStore);
     var redo = new RedoAddon(urDataStore);
 

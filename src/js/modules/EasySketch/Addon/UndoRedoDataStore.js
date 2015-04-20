@@ -12,8 +12,17 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
      * Data store manager for the undo/redo addons
      *
      * @constructor
+     * @param {EasySketch.Sketch} object The Sketch object
      */
-    AbstractAddon.UndoRedoDataStore = function () {
+    AbstractAddon.UndoRedoDataStore = function (object) {
+
+        /**
+         *
+         * @type {EasySketch.Sketch}
+         * @private
+         */
+        this._object = object;
+
         /**
          * The lines that are visible on the workspace
          *
@@ -29,9 +38,50 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          * @private
          */
         this._stashedLines = [];
+
+        /**
+         *
+         * @type {Array}
+         * @private
+         */
+        this._currentLine = [];
+
+        // Attaching some listeners to the Sketch object so we can store the line data
+        var eventManager = this._object.getEventManager();
+        eventManager.attach(EasySketch.Sketch.NOTIFY_START_EVENT, this.onPaint.bind(this))
+            .attach(EasySketch.Sketch.NOTIFY_PAINT_EVENT, this.onPaint.bind(this))
+            .attach(EasySketch.Sketch.NOTIFY_STOP_EVENT, this.onStopPaint.bind(this));
     };
 
     AbstractAddon.UndoRedoDataStore.prototype = {
+        /**
+         * Pushes the lines that are drawn to the array that identifies the current line
+         *
+         * @param {EasySketch.Event} event
+         * @returns {AbstractAddon.UndoRedoDataStore}
+         */
+        onPaint: function (event) {
+            this._currentLine.push(event.getParam(0));
+
+            return this;
+        },
+
+        /**
+         * Transfers the current line to the lines array
+         *
+         * @returns {AbstractAddon.UndoRedoDataStore}
+         */
+        onStopPaint: function () {
+            this._dataStore.pushLine({
+                options: this._object.getDrawingOptions(),
+                points: this._currentLine
+            });
+
+            this._currentLine = [];
+
+            return this;
+        },
+
         /**
          *
          * @returns {Array}
@@ -66,17 +116,20 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
         },
 
         /**
+         * Extracts the line that needs to be redone, pushes it to the visible lines array and returns the line data
          *
-         * @returns {AbstractAddon.UndoRedoDataStore}
+         * @returns {Array}
          */
         redo: function () {
             if (this._stashedLines.length <= 0) {
-                return this;
+                return [];
             }
 
-            this._lines.push(this._stashedLines.pop());
+            var redoLine = this._stashedLines.pop();
 
-            return this;
+            this._lines.push(redoLine);
+
+            return redoLine;
         },
 
         /**
