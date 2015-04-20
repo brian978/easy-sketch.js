@@ -72,7 +72,7 @@ requirejs([
         $('.line-opacity-controls').find('.info').html((lineOpacity * 100) + "%");
     });
 
-    // Predefined line
+    // Predefined transparent line
     sketcher.setOptions({alpha: 0.1});
     sketcher.drawLine([
         {
