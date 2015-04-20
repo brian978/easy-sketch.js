@@ -7,7 +7,7 @@
  */
 
 define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
-    
+
     /**
      * Constructor for the undo addon
      *
@@ -16,7 +16,7 @@ define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
      * @param {EasySketch.Addon.UndoRedoDataStore} dataStore
      * @returns {void}
      */
-    AbstractAddon.Redo = function(dataStore) {
+    AbstractAddon.Redo = function (dataStore) {
         /**
          *
          * @type {EasySketch.Addon.UndoRedoDataStore}
@@ -31,14 +31,18 @@ define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
          *
          * @returns {AbstractAddon.Redo}
          */
-        execute: function()
-        {
+        execute: function () {
+            // Moves the last line in the "undo" queue
+            var line = this._dataStore.redo();
+
+            if (line.length == 0) {
+                return this;
+            }
+
             // Storing the drawing options so we can restore them after the redraw
             var options = this._object.getDrawingOptions();
 
             // Redrawing the lines
-            var line = this._dataStore.redo();
-
             this._object.setOptions(line.options);
             this._object.drawLine(line.points);
 

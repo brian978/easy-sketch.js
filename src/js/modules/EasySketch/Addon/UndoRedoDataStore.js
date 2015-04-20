@@ -72,7 +72,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          * @returns {AbstractAddon.UndoRedoDataStore}
          */
         onStopPaint: function () {
-            this._dataStore.pushLine({
+            this._lines.push({
                 options: this._object.getDrawingOptions(),
                 points: this._currentLine
             });
