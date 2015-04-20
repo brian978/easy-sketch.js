@@ -46,7 +46,7 @@ define(["../EasySketch", "./AbstractAddon", "../Util"], function (EasySketch, Ab
             for (var idx in lines) {
                 if (lines.hasOwnProperty(idx)) {
                     this.object.setOptions(lines[idx].options);
-                    this.object.drawLine(lines[idx].points);
+                    this.object.drawLine(lines[idx].points, true);
                 }
             }
 

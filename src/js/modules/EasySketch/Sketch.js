@@ -147,6 +147,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
     EasySketch.Sketch.NOTIFY_START_EVENT = 'notify.start';
     EasySketch.Sketch.NOTIFY_PAINT_EVENT = 'notify.paint';
     EasySketch.Sketch.NOTIFY_STOP_EVENT = 'notify.stop';
+    EasySketch.Sketch.NOTIFY_LINE_DRAWN = 'notify.line.drawn';
 
     EasySketch.Sketch.prototype = {
         /**
@@ -548,7 +549,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
 
             // Flushing the buffer
             if (this.options.doubleBuffering === true && this.eraser === false) {
-                this.drawLine(this.points);
+                this.drawLine(this.points, true);
                 this.points = [];
                 this.clearOverlay();
             }
@@ -611,9 +612,12 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
         /**
          *
          * @param {Array} pointsArray
+         * @param {boolean=false} skipEvent
          * @returns {EasySketch.Sketch}
          */
-        drawLine: function (pointsArray) {
+        drawLine: function (pointsArray, skipEvent) {
+            skipEvent = skipEvent || false;
+
             // Drawing a line MUST always be done on the master canvas
             var context = this.context;
 
@@ -621,6 +625,12 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             this.contextSetup(context);
             this.drawPoints(pointsArray, context);
             this.contextRestore(context);
+
+            // This is used mostly by addons or components of addons
+            if (!skipEvent) {
+                this.getEventManager()
+                    .trigger(EasySketch.Sketch.NOTIFY_LINE_DRAWN, this, [pointsArray, this.getDrawingOptions()]);
+            }
 
             return this;
         },

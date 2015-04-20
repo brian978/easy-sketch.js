@@ -44,7 +44,7 @@ define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
 
             // Redrawing the lines
             this.object.setOptions(line.options);
-            this.object.drawLine(line.points);
+            this.object.drawLine(line.points, true);
 
             // Restore
             this.object.setOptions(options);

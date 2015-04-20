@@ -50,7 +50,8 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
         var eventManager = this._object.getEventManager();
         eventManager.attach(EasySketch.Sketch.NOTIFY_START_EVENT, this.onPaint.bind(this))
             .attach(EasySketch.Sketch.NOTIFY_PAINT_EVENT, this.onPaint.bind(this))
-            .attach(EasySketch.Sketch.NOTIFY_STOP_EVENT, this.onStopPaint.bind(this));
+            .attach(EasySketch.Sketch.NOTIFY_STOP_EVENT, this.onStopPaint.bind(this))
+            .attach(EasySketch.Sketch.NOTIFY_LINE_DRAWN, this.onLineDrawn.bind(this));
     };
 
     AbstractAddon.UndoRedoDataStore.prototype = {
@@ -73,8 +74,8 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          */
         onStopPaint: function () {
             this._lines.push({
-                options: this._object.getDrawingOptions(),
-                points: this._currentLine
+                points: this._currentLine,
+                options: this._object.getDrawingOptions()
             });
 
             this._currentLine = [];
@@ -88,6 +89,21 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
          */
         getVisibleLines: function () {
             return this._lines;
+        },
+
+        /**
+         * The data store needs to register the change when the drawLine() method from the Sketch object is called
+         *
+         * @param {EasySketch.Event} event
+         * @returns {AbstractAddon.UndoRedoDataStore}
+         */
+        onLineDrawn: function (event) {
+            this._lines.push({
+                points: event.getParam(0),
+                options: event.getParam(1)
+            });
+
+            return this;
         },
 
         /**
