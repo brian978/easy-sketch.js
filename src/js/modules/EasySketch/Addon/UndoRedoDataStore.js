@@ -79,6 +79,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
             });
 
             this._currentLine = [];
+            this._stashedLines = [];
 
             return this;
         },
