@@ -2,9 +2,10 @@
  * easy-sketch.js
  *
  * @link https://github.com/brian978/easy-sketch.js
- * @copyright Copyright (c) 2014
- * @license Creative Commons Attribution-ShareAlike 3.0
+ * @copyright Copyright (c) 2015
+ * @license https://github.com/brian978/easy-sketch.js/blob/master/LICENSE New BSD License
  */
+
 define(["./EasySketch"], function (EasySketch) {
 
     EasySketch.Util = {
@@ -59,6 +60,31 @@ define(["./EasySketch"], function (EasySketch) {
             }
 
             return scale;
+        },
+
+        /**
+         * Extends a child object from a parent
+         *
+         * @param {Object} parent
+         * @param {Object} child
+         */
+        extend: function (parent, child) {
+            // Inheriting the methods
+            for (var method in parent.prototype) {
+                if (parent.prototype.hasOwnProperty(method) && typeof parent.prototype[method] === "function") {
+                    // We must not overwrite the methods in the child if they already exist
+                    if(!child.prototype.hasOwnProperty(method)) {
+                        child.prototype[method] = parent.prototype[method];
+                    }
+                }
+            }
+
+            // Inheriting the properties
+            for (var property in parent) {
+                if (parent.hasOwnProperty(property) && typeof parent.prototype[method] !== "function") {
+                    child[property] = parent[property];
+                }
+            }
         }
     };
 

@@ -2,7 +2,7 @@ easy-sketch.js
 ===================
 
 easy-sketch.js allows you to draw on canvas without having to dig into the HTML 5 API. It's very easy to use,
-very flexible, very small (9KB compressed) and can be extended with ease if needed.
+very flexible, very small (13KB compressed) and can be extended with ease if needed.
 
 A demo can be found at http://brian978.github.io/easy-sketch.js/
 
@@ -123,3 +123,25 @@ To clear the canvas all you need to do is call the *clear()* method:
 You can also clear the overlay **manually** when double buffering is enabled:
 
     sketcher.clearOverlay();
+
+
+## Addons
+
+The addon system allows you to "attach" different features to the EasySketch library. To create an addon you must
+"extend" the *EasySketch.Addon.AbstractAddon* class and then attach the addon using the registerAddon() method in the
+`Sketch` object
+
+### Undo/Redo
+
+The undo and redo can be used separately (although the redo doesn't make any sense without the undo) and they depend on
+the `EasySketch/Addon/UndoRedoDataStore` class. The `EasySketch/Addon/UndoRedoDataStore` class basically stores the
+points that were drawn on the canvas and moves them around in different stacks when the undo/redo feature is used.
+
+To create the objects you need to do the following (after you import the classes using the RequireJS syntax of course):
+
+    var urDataStore = new UndoRedoDataStore(sketcher);
+    var undo = new UndoAddon(urDataStore);
+    var redo = new RedoAddon(urDataStore);
+
+    sketcher.registerAddon(undo);
+    sketcher.registerAddon(redo);

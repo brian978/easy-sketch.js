@@ -1,13 +1,18 @@
-/**
- * easy-sketch.js
- *
- * @link https://github.com/brian978/easy-sketch.js
- * @copyright Copyright (c) 2014
- * @license Creative Commons Attribution-ShareAlike 3.0
- */
-
-requirejs(["EasySketch/Sketch"], function(Sketch){
+requirejs([
+    "EasySketch/Sketch",
+    "EasySketch/Addon/Redo",
+    "EasySketch/Addon/Undo",
+    "EasySketch/Addon/UndoRedoDataStore"
+], function (Sketch, RedoAddon, UndoAddon, UndoRedoDataStore) {
     var sketcher = new Sketch("#drawing-canvas", {doubleBuffering: true});
+
+    // Initializing the addons
+    var urDataStore = new UndoRedoDataStore(sketcher);
+    var undo = new UndoAddon(urDataStore);
+    var redo = new RedoAddon(urDataStore);
+
+    sketcher.registerAddon(undo);
+    sketcher.registerAddon(redo);
 
     // Disables the eraser
     $('#pencil').on('click', function () {
@@ -19,9 +24,20 @@ requirejs(["EasySketch/Sketch"], function(Sketch){
         sketcher.enableEraser(true);
     });
 
-    // Enables the eraser
+    // Clear button
     $('#clear').on('click', function () {
         sketcher.clear();
+        urDataStore.clear();
+    });
+
+    // Undo button
+    $("#undo").on('click', function () {
+        undo.execute();
+    });
+
+    // Redo button
+    $("#redo").on('click', function () {
+        redo.execute();
     });
 
     $('#line-width-control').on('change', function () {
@@ -47,11 +63,6 @@ requirejs(["EasySketch/Sketch"], function(Sketch){
         // Informational purposes
         $('.line-opacity-controls').find('.info').html((lineOpacity * 100) + "%");
     });
-
-    // Getting the default color
-    var defaultColor = sketcher.getOption('color');
-    sketcher.context.font = "normal 20px Calibri";
-    sketcher.context.fillText("Default brush color: " + defaultColor, 200, 50);
 
     // Predefined line
     sketcher.setOptions({alpha: 0.1});

@@ -1,6 +1,6 @@
 {
     "baseUrl": "./modules/",
-    "optimize": "none",
+    "optimize": "uglify2",
     "mainConfigFile": "./modules/Main/config.js",
     "name": "./Main/app",
     "out": "./build/application.min.js"

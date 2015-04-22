@@ -2,8 +2,8 @@
  * easy-sketch.js
  *
  * @link https://github.com/brian978/easy-sketch.js
- * @copyright Copyright (c) 2014
- * @license Creative Commons Attribution-ShareAlike 3.0
+ * @copyright Copyright (c) 2015
+ * @license https://github.com/brian978/easy-sketch.js/blob/master/LICENSE New BSD License
  */
 
 define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, EventManager, Util) {
@@ -118,6 +118,15 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             stop: this.stopDrawing.bind(this)
         };
 
+        /**
+         * Contains the list of addons attached to the sketcher
+         *
+         * @type {Array}
+         * @protected
+         */
+        this.addons = [];
+
+        // Setting the options
         if (options) {
             this.setOptions(options);
         }
@@ -138,6 +147,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
     EasySketch.Sketch.NOTIFY_START_EVENT = 'notify.start';
     EasySketch.Sketch.NOTIFY_PAINT_EVENT = 'notify.paint';
     EasySketch.Sketch.NOTIFY_STOP_EVENT = 'notify.stop';
+    EasySketch.Sketch.NOTIFY_LINE_DRAWN = 'notify.line.drawn';
 
     EasySketch.Sketch.prototype = {
         /**
@@ -184,7 +194,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          * @returns {EasySketch.Sketch}
          */
         setOption: function (name, value) {
-            if (typeof name == "string" && this.options.hasOwnProperty(name)) {
+            if (typeof name === "string" && this.options.hasOwnProperty(name)) {
                 this.options[name] = value;
             }
 
@@ -206,6 +216,20 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             }
 
             return defaultValue;
+        },
+
+        /**
+         * Returns the relevant options required to create a line
+         *
+         * @returns {{color: String, width: int, alpha: float}}
+         */
+        getDrawingOptions: function()
+        {
+            return {
+                color: this.options.color,
+                width: this.options.width,
+                alpha: this.options.alpha
+            };
         },
 
         /**
@@ -244,15 +268,15 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
                     break;
             }
 
-            if(canvas.css("position").indexOf("absolute") === -1) {
+            if (canvas.css("position").indexOf("absolute") === -1) {
                 canvas.css("position", "absolute");
             }
 
-            if(isNaN(parseInt(canvas.css("top")))) {
+            if (isNaN(parseInt(canvas.css("top")))) {
                 canvas.css("top", 0);
             }
 
-            if(isNaN(parseInt(canvas.css("left")))) {
+            if (isNaN(parseInt(canvas.css("left")))) {
                 canvas.css("left", 0);
             }
 
@@ -294,7 +318,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
          * @private
          */
         _autoAdjustOverlay: function () {
-            if(this.overlay !== null) {
+            if (this.overlay !== null) {
                 var scale = Util.getScale(this.canvas);
 
                 this.overlay.attr("width", this.canvas.attr("width"));
@@ -525,7 +549,7 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
 
             // Flushing the buffer
             if (this.options.doubleBuffering === true && this.eraser === false) {
-                this.drawLine(this.points);
+                this.drawLine(this.points, true);
                 this.points = [];
                 this.clearOverlay();
             }
@@ -588,9 +612,12 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
         /**
          *
          * @param {Array} pointsArray
+         * @param {boolean=false} skipEvent
          * @returns {EasySketch.Sketch}
          */
-        drawLine: function (pointsArray) {
+        drawLine: function (pointsArray, skipEvent) {
+            skipEvent = skipEvent || false;
+
             // Drawing a line MUST always be done on the master canvas
             var context = this.context;
 
@@ -598,6 +625,12 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             this.contextSetup(context);
             this.drawPoints(pointsArray, context);
             this.contextRestore(context);
+
+            // This is used mostly by addons or components of addons
+            if (!skipEvent) {
+                this.getEventManager()
+                    .trigger(EasySketch.Sketch.NOTIFY_LINE_DRAWN, this, [pointsArray, this.getDrawingOptions()]);
+            }
 
             return this;
         },
@@ -620,6 +653,19 @@ define(["./EasySketch", "./EventManager", "./Util"], function (EasySketch, Event
             if (this.overlayContext instanceof CanvasRenderingContext2D) {
                 this.overlayContext.clearRect(0, 0, this.overlay[0].width, this.overlay[0].height);
             }
+
+            return this;
+        },
+
+        /**
+         *
+         * @param {EasySketch.Addon.AbstractAddon} addon
+         * @returns {EasySketch.Sketch}
+         */
+        registerAddon: function (addon) {
+            this.addons.push(addon);
+
+            addon.attachSketchObject(this);
 
             return this;
         }
