@@ -3,7 +3,7 @@
  *
  * @link https://github.com/brian978/easy-sketch.js
  * @copyright Copyright (c) 2015
- * @license Creative Commons Attribution-ShareAlike 3.0
+ * @license https://github.com/brian978/easy-sketch.js/blob/master/LICENSE New BSD License
  */
 
 define(["../EasySketch", "./Addon"], function (EasySketch, Addon) {
