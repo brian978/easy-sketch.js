@@ -30,7 +30,7 @@ define(["./EasySketch", "./Event"], function (EasySketch) {
          * @private
          */
         _prepareEvent: function (event) {
-            if (typeof event == "string") {
+            if ("string" === typeof event) {
                 if (event.indexOf(" ") !== -1) {
                     event = event.split(" ");
                 } else {
@@ -59,9 +59,9 @@ define(["./EasySketch", "./Event"], function (EasySketch) {
          * @returns {EasySketch.EventManager}
          */
         attach: function (event, callback) {
-            var evt;
-            var events = this._prepareEvent(event);
-            for (var key in events) {
+            let evt;
+            let events = this._prepareEvent(event);
+            for (let key in events) {
                 if (events.hasOwnProperty(key)) {
                     evt = events[key];
                     if (this.events.hasOwnProperty(evt) === false) {
@@ -93,9 +93,9 @@ define(["./EasySketch", "./Event"], function (EasySketch) {
          * @returns {EasySketch.EventManager}
          */
         detach: function (event, callback) {
-            var evt;
-            var events = this._prepareEvent(event);
-            for (var key in events) {
+            let evt;
+            let events = this._prepareEvent(event);
+            for (let key in events) {
                 if (events.hasOwnProperty(key)) {
                     evt = events[key];
                     if (this.events.hasOwnProperty(evt)) {
@@ -120,10 +120,10 @@ define(["./EasySketch", "./Event"], function (EasySketch) {
          * @returns {EasySketch.Event|null}
          */
         trigger: function (event, target, params) {
-            var eventObject = null;
+            let eventObject = null;
             if (this.events.hasOwnProperty(event)) {
                 eventObject = new EasySketch.Event(event, target, params);
-                for (var key in this.events[event]) {
+                for (let key in this.events[event]) {
                     if (this.events[event].hasOwnProperty(key)) {
                         this.events[event][key].call(null, eventObject);
                     }
