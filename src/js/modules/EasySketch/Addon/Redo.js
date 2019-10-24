@@ -35,7 +35,7 @@ define(["./AbstractAddon", "../Util"], function (AbstractAddon, Util) {
             // Moves the last line in the "undo" queue
             var line = this._dataStore.redo();
 
-            if (line.length == 0) {
+            if (0 === line.length) {
                 return this;
             }
 

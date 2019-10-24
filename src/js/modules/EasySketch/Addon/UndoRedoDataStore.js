@@ -47,7 +47,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
         this._currentLine = [];
 
         // Attaching some listeners to the Sketch object so we can store the line data
-        var eventManager = this._object.getEventManager();
+        let eventManager = this._object.getEventManager();
         eventManager.attach(EasySketch.Sketch.NOTIFY_START_EVENT, this.onPaint.bind(this))
             .attach(EasySketch.Sketch.NOTIFY_PAINT_EVENT, this.onPaint.bind(this))
             .attach(EasySketch.Sketch.NOTIFY_STOP_EVENT, this.onStopPaint.bind(this))
@@ -142,7 +142,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
                 return [];
             }
 
-            var redoLine = this._stashedLines.pop();
+            let redoLine = this._stashedLines.pop();
 
             this._lines.push(redoLine);
 
@@ -150,6 +150,7 @@ define(["../EasySketch", "./AbstractAddon"], function (EasySketch, AbstractAddon
         },
 
         /**
+         * Resets the lines storage
          *
          * @returns {AbstractAddon.UndoRedoDataStore}
          */

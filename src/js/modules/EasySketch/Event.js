@@ -86,17 +86,17 @@ define(["./EasySketch"], function (EasySketch) {
         },
 
         /**
+         * Stops the propagation for the event
          *
-         * @returns {EasySketch.Event}
+         * @returns {void}
          */
         stopPropagation: function()
         {
             this._propagationStopped = true;
-
-            return this;
         },
 
         /**
+         * Checks if the propagation is stopped
          *
          * @returns {boolean}
          */
